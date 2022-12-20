@@ -246,36 +246,6 @@ export default function CustomPaginationActionsTable() {
     }
   }, [tables]);
 
-  // helper function to get an element's exact position
-  // function getPosition(el: HTMLElement | null) {
-  //   var xPosition = 0;
-  //   var yPosition = 0;
-
-  //   if (el) {
-  //     if (el.tagName == "BODY") {
-  //       // deal with browser quirks with body/window/document and page scroll
-  //       var xScrollPos = el.scrollLeft || document.documentElement.scrollLeft;
-  //       var yScrollPos = el.scrollTop || document.documentElement.scrollTop;
-
-  //       xPosition = el.offsetLeft - xScrollPos + el.clientLeft;
-  //       yPosition = el.offsetTop - yScrollPos + el.clientTop;
-  //     } else {
-  //       xPosition = el.offsetLeft - el.scrollLeft + el.clientLeft;
-  //       yPosition = 0;
-  //       if (el.offsetTop) {
-  //         yPosition = el.offsetTop - el.scrollTop + el.clientTop;
-  //       } else if (el.offsetParent) {
-  //         let ot = el.offsetParent as any;
-  //         yPosition = ot.offsetTop - el.scrollTop + el.clientTop;
-  //       }
-  //     }
-  //   }
-  //   return {
-  //     x: xPosition,
-  //     y: yPosition,
-  //   };
-  // }
-
   interface HDCC {
     event: React.MouseEvent<HTMLTableCellElement, MouseEvent>,
     id: string,
@@ -311,26 +281,19 @@ export default function CustomPaginationActionsTable() {
 
       // const pos = getPosition(event?.currentTarget);
       // if (pos.x !== 0 && pos.y !== 0) {
-        setAnchorPoint({
-          // x: pos.x,
-          // y: pos.y,
-          x: event.pageX,
-          y: event.pageY,
-          anchorEl: event?.currentTarget, //(event.nativeEvent.currentTarget as HTMLTableCellElement), 
-        });
+      setAnchorPoint({
+        // x: pos.x,
+        // y: pos.y,
+        x: event.pageX,
+        y: event.pageY,
+        anchorEl: event?.currentTarget, //(event.nativeEvent.currentTarget as HTMLTableCellElement), 
+      });
       // }
       setShowDBEMenu(!showDBEMenu);
     },
     [setAnchorPoint, setShowDBEMenu, showDBEMenu]
   );
 
-  // interface HDCC {
-  //   event: React.MouseEvent<HTMLTableCellElement>, 
-  //   id: string, 
-  //   colName: string, 
-  //   value: string | ReactNode, 
-  //   tableName: string
-  // }
   useEffect(() => {
     if (updateTable) {
       setUpdateTable(false);
@@ -356,13 +319,7 @@ export default function CustomPaginationActionsTable() {
                     backgroundColor: "background.darkerBlue",
                   },
                 }}
-                // interface HDCC {
-                //   event: React.MouseEvent<HTMLTableCellElement>, 
-                //   id: string, 
-                //   colName: string, 
-                //   value: string | ReactNode, 
-                //   tableName: string
-                // }                
+
                 onDoubleClickCapture={(e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => handleDoubleClickCapture({
                   event: e,
                   id: "header",
@@ -428,12 +385,6 @@ export default function CustomPaginationActionsTable() {
     return <TableRow key={row.id}>{cells}</TableRow>;
   }
 
-  // interface CurrentSelection {
-  //   id: string,
-  //   columnName: string,
-  //   value: string | ReactNode,
-  //   tableName: string,
-  // };
   const handleTableChange = (evt: SelectChangeEvent<string>, child: React.ReactNode) => {
     if (!evt) return;
     const tableName = (child as any)?.props.value;
@@ -557,8 +508,8 @@ export default function CustomPaginationActionsTable() {
     });
   };
 
-  const createColumn = (tableName: string, columnName: string) => {
-    createCol(tableName, columnName).then((result) => {
+  const createColumn = (tableName: string, columnName: string, dataType: string) => {
+    createCol(tableName, columnName, dataType).then((result) => {
       setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
       setUpdateTable(true);
       showCreateColumnDialog(false);
@@ -642,18 +593,18 @@ export default function CustomPaginationActionsTable() {
               removeRow={() => deleteDBRow}
             />
           ) : null}
-
-          <Grid item xs={12}>
-            <Box sx={{alignContent: "center", justifyContent: "center", display: "flex"}}>
-            <DBSelect
-              // htc={(e: React.ChangeEvent<HTMLSelectElement>, tableName: string) => handleTableChange(e, tableName)}
-              htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)}
-              tables={tables}
-              curSel={currentSelection.tableName}
-            />
-            <ExportTablesButtons />
-            </Box>
+          <Grid container>
+            <Grid item xs={4} />
+            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+              <DBSelect 
+                htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} 
+                tables={tables} 
+                curSel={currentSelection.tableName} />
+              <ExportTablesButtons />
+            </Grid>
+            <Grid item xs={4} />
           </Grid>
+          
           <Grid item>
             <TableContainer component={Paper}>
               <Table
@@ -776,15 +727,16 @@ export default function CustomPaginationActionsTable() {
             oldColumnName={currentSelection.columnName}
           />
 
-          <Grid item xs={12}>
-          <Box sx={{alignContent: "center", justifyContent: "center", diplay: "flex"}}>
-            <DBSelect
-              htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)}
-              tables={tables}
-              curSel={currentSelection.tableName}
-            />
-            <ExportTablesButtons />
-            </Box>
+          <Grid container>
+            <Grid item xs={4} />
+            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+              <DBSelect 
+                htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} 
+                tables={tables} 
+                curSel={currentSelection.tableName} />
+              <ExportTablesButtons />
+            </Grid>
+            <Grid item xs={4} />
           </Grid>
           <Grid item>
             <TableContainer component={Paper}>
@@ -852,9 +804,13 @@ export default function CustomPaginationActionsTable() {
     } else {
       return (
         <StyledHeaderGrid>
-          <Grid item>
-            <DBSelect htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} tables={tables} curSel="" />
-            <ExportTablesButtons />
+          <Grid container>
+            <Grid item xs={4} />
+            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+              <DBSelect htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} tables={tables} curSel="" />
+              <ExportTablesButtons />
+            </Grid>
+            <Grid item xs={4} />
           </Grid>
         </StyledHeaderGrid>
       );

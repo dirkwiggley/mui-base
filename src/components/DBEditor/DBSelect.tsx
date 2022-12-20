@@ -52,28 +52,22 @@ export default function DBSelect({ htc, tables, curSel }: Props) {
   }
 
   return (
-    <StyledBox>
-      <Grid container>
-        <Grid item xs={12} style={{alignItems: "center", justifyContent: "center"}}>
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="select-table">Table</InputLabel>
-            <Select
-              labelId="select-table"
-              id="select-table"
-              value={currentSelection ? currentSelection : ""}
-              label="Table"
-              onChange={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleChange(evt, child)}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {createMenuItems()}
+    <FormControl sx={{ m: 1, minWidth: 120 }}>
+      <InputLabel id="select-table">Table</InputLabel>
+      <Select
+        labelId="select-table"
+        id="select-table"
+        value={currentSelection ? currentSelection : ""}
+        label="Table"
+        onChange={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleChange(evt, child)}
+      >
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+        {createMenuItems()}
 
-            </Select>
-            <FormHelperText>Select database table</FormHelperText>
-          </FormControl>
-        </Grid>
-      </Grid>
-    </StyledBox>
+      </Select>
+      <FormHelperText>Select database table</FormHelperText>
+    </FormControl>
   );
 }

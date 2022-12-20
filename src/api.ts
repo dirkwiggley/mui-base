@@ -336,12 +336,12 @@ export const renTable = (accessToken: string, oldTableName: string, newTableName
 };
 
 // const url = URL_PREFIX + `/createcolumn/${tableName}/${columnName}`;
-export const createCol = (tableName: string, columnName: string) => {
+export const createCol = (tableName: string, columnName: string, dataType: string) => {
   const accessToken = localStorage.getItem("accessToken");
   return new Promise(function (resolve, reject) {
     axios
       .get(
-        `${CONFIG.baseDbURL}/dbutils/createcolumn/${tableName}/${columnName}`,
+        `${CONFIG.baseDbURL}/dbutils/createcolumn/${tableName}/${columnName}/${dataType}`,
         { headers: { Authorization: `Bearer ${accessToken}` } }
       )
       .then((response) => {

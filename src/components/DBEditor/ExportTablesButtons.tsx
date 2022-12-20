@@ -1,4 +1,4 @@
-import { Box, Button} from "@mui/material";
+import { Box, Button, Grid} from "@mui/material";
 import { exportDB } from '../../api';
 
 const ExportTablesButtons = () => {
@@ -8,10 +8,7 @@ const ExportTablesButtons = () => {
     }
 
     return (
-        <Box>
-            <Button onClick={exportAll}>Export DB</Button>
-        </Box>
-
+        <Button onClick={exportAll} variant="contained">Export DB</Button>
     );
 }
 

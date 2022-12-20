@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 interface Props {
   openDlg: boolean,
@@ -18,18 +19,34 @@ export default function AddColumnDialog({ openDlg, setOpen, createCallback, tabl
   const [show, setShow] = React.useState(openDlg);
   const [setShowDlg] = React.useState(setOpen);
   const [create] = React.useState(createCallback);
+  const [colName, setColName] = React.useState('');
+  const [dataType, setDataType] = React.useState<string>('');
 
   React.useEffect(() => {
     setShow(openDlg);
   }, [openDlg]);
 
+  const colTypes = ['text', 'numeric', 'real', 'integer', 'blob'];
+  
+  const createIsDisabled = () : boolean | undefined => {
+    return !((colName?.length > 3) && (colTypes?.includes(dataType)));
+  }
+
   const handleClose = (request: string) => {
     setShowDlg(false);
-    if (request === "add") {
-      const name = (document.getElementById("name") as HTMLInputElement).value;
-      create(tableName, name);
+    if (request === "add") {      
+      create(tableName, colName, dataType);
     }
   };
+
+  const handleColNameChange = (evt: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setColName(evt.currentTarget.value);
+  }
+
+  const changeColDataType = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
+    setDataType(event.target.value);
+  }
+
 
   return (
     <div>
@@ -46,12 +63,29 @@ export default function AddColumnDialog({ openDlg, setOpen, createCallback, tabl
             label="Column Name"
             type="text"
             fullWidth
-            variant="standard"
+            variant="outlined"
+            onChange={(evt) => handleColNameChange(evt)}
+            value={colName}
           />
+          <DialogContentText>
+            Enter the column data type.
+          </DialogContentText>
+          <Select
+            value={dataType}
+            label="Data Type"
+            onChange={changeColDataType}
+            sx={{width: "100%"}}
+            >
+              <MenuItem value="text">Text</MenuItem>
+              <MenuItem value="numeric">Numeric</MenuItem>
+              <MenuItem value="integer">Integer</MenuItem>
+              <MenuItem value="real">Real</MenuItem>
+              <MenuItem value="blob">Blob</MenuItem>
+          </Select>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleClose("cancel")}>Cancel</Button>
-          <Button onClick={() => handleClose("add")}>Create Column</Button>
+          <Button variant="outlined" onClick={() => handleClose("cancel")}>Cancel</Button>
+          <Button variant="outlined" onClick={() => handleClose("add")} disabled={createIsDisabled()}>Create Column</Button>
         </DialogActions>
       </Dialog>
     </div>
