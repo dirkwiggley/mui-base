@@ -337,7 +337,7 @@ export default function CustomPaginationActionsTable() {
         }
       });
     }
-  }, [updateTable, handleDoubleClickCapture]);
+  }, [currentSelection, updateTable, handleDoubleClickCapture]);
 
   function createRow(row: any) {
     const cells = [];
