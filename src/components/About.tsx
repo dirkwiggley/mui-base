@@ -73,6 +73,12 @@ function About() {
                   <br />
                   {'"a benevolent smile"'}
                 </Typography>
+                <Typography sx={{mt: 2}} variant="body2">
+                  * For the demo, login as
+                </Typography>
+                <Typography variant="body2">
+                  admin/admin or user/user *
+                </Typography>
               </CardContent>
               <CardActions>
                 <Button

@@ -313,10 +313,11 @@ export default function CustomPaginationActionsTable() {
                 scope="row"
                 key={index}
                 sx={{
-                  bgcolor: "background.lightBlue",
+                  bgcolor: "#2F8F9D",
+                  border: "2px",
                   "&:hover": {
                     cursor: "pointer",
-                    backgroundColor: "background.darkerBlue",
+                    backgroundColor: "#3BACB6",
                   },
                 }}
 
@@ -749,7 +750,7 @@ export default function CustomPaginationActionsTable() {
                   {hasNoRows() && (
                     <TableRow style={{ height: 53 * getEmptyRows() }}>
                       <TableCell colSpan={6}>
-                        No data in table{" "}
+                        No data in table
                         <Button onClick={createDBRow} variant="text">
                           Create a row
                         </Button>
