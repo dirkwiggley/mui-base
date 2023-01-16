@@ -81,7 +81,7 @@ export const refreshToken = (token: any) => {
   const params = { token: token };
   return new Promise(function (resolve, reject) {
     axios
-      .put(`${CONFIG.baseDbURL}/refresh/`, params)
+      .post(`${CONFIG.baseDbURL}/refresh/`, params)
       .then((response) => {
         const user = { ...response.data };
         const roles = JSON.parse(user.roles);
@@ -478,7 +478,7 @@ export const initRefreshTokens = () => {
   return new Promise(function (resolve, reject) {
     axios
       .post(
-        `${CONFIG.baseDbURL}/auth/initrefreshtokens`, {
+        `${CONFIG.baseDbURL}/auth/initrefreshtokens`, null, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((response) => {
