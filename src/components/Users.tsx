@@ -19,7 +19,7 @@ import {
 import { styled } from '@mui/material/styles';
 
 import { useAuthContext, UserInfo } from "./AuthStore";
-import { getUsers, getUser, getRoles, RoleType, updateUser, initRefreshTokens } from '../api';
+import { getUsers, getUser, getRoles, RoleType, updateUser } from '../api';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -49,6 +49,7 @@ const Users = () => {
   const [roles, setRoles] = useState<string[] | null>(null);
   const [active, setActive] = useState<boolean>(false);
   const [resetpwd, setResetpwd] = useState<boolean>(false);
+  const [refreshtoken, setRefreshToken] = useState<string | undefined>("");
   const [rolesList, setRolesList] = useState<string[] | null>(null);
 
   let navigate = useNavigate();
@@ -69,6 +70,7 @@ const Users = () => {
         setRoles(auth.roles);
         setActive(auth.active);
         setResetpwd(auth.resetpwd);
+        setRefreshToken(auth.refreshtoken);
       }
     }
 
@@ -195,6 +197,7 @@ const Users = () => {
       roles: newRoles,
       active: active,
       resetpwd: resetpwd,
+      refreshtoken: refreshtoken,
     }
     updateUser(userInfo)
       .then(result => {
@@ -226,10 +229,6 @@ const Users = () => {
     }
   }
 
-  const deleteRefeshTokens = () => {
-    initRefreshTokens();
-  }
-  
   const getLoginInput = () => {
     if (userId === "add") {
       return (
@@ -355,7 +354,6 @@ const Users = () => {
           </StackItem>
           <StackItem>
             <Button variant="contained" onClick={handleUpdate}>Update</Button>
-            { isAdmin() ? (<Button variant="contained" onClick={deleteRefeshTokens}>Delete Refresh Tokens</Button>) : null }
           </StackItem>
         </Stack>
       </StyledPaper>

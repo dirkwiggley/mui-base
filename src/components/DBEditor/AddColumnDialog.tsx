@@ -47,7 +47,6 @@ export default function AddColumnDialog({ openDlg, setOpen, createCallback, tabl
     setDataType(event.target.value);
   }
 
-
   return (
     <div>
       <Dialog open={show} onClose={handleClose}>

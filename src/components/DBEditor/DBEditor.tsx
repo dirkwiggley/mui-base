@@ -229,21 +229,14 @@ export default function CustomPaginationActionsTable() {
   }, [auth, navigate]);
 
   useEffect(() => {
-    const accessToken: string | null = localStorage.getItem("accessToken");
-    if (accessToken) {
-      getTables(accessToken)
-        .then((response) => {
-          console.log(response);
-          return response;
-        })
-        .then((tableNames) => {
-          if (Array.isArray(tableNames)) {
-            if (!equalsIgnoreOrder(tables, tableNames)) {
-              setTables(tableNames);
-            }
+    getTables()
+      .then((tableNames) => {
+        if (Array.isArray(tableNames)) {
+          if (!equalsIgnoreOrder(tables, tableNames)) {
+            setTables(tableNames);
           }
-        });
-    }
+        }
+      });
   }, [tables]);
 
   interface HDCC {

@@ -77,12 +77,14 @@ export default function MenuAppBar() {
   };
 
   const handleLogout = () => {
-    handleClose();
-    navigate("/exit");
-    setAuth?.(null);
-    setRoles([]);
-    setIsAdmin(false);
-    logoutApi();
+    if (auth) {
+      handleClose();
+      navigate("/exit");
+      setAuth?.(null);
+      setRoles([]);
+      setIsAdmin(false);
+      logoutApi(auth.id);
+    }
   };
 
   const handleProfile = (event: React.SyntheticEvent) => {

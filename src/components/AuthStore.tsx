@@ -8,6 +8,7 @@ export interface UserInfo {
     roles: string[];
     active: boolean;
     resetpwd: boolean;
+    refreshtoken?: string;
 };
 
 export const instanceofUserInfo = (x: any): boolean => {
@@ -26,6 +27,7 @@ export const convertToUserInfo = (x: any): UserInfo => {
         roles: x.roles,
         active: x.active,
         resetpwd: x.resetpwd,
+        refreshtoken: x.refreshtoken
     };
     return newUserInfo;
 }
@@ -37,7 +39,8 @@ const defaultUserInfo: UserInfo = {
     email: "default@default.com",
     roles: [],
     active: false,
-    resetpwd: false
+    resetpwd: false,
+    refreshtoken: "",
 }
 
 export const useAuthStore = (initial: UserInfo) => React.useState<UserInfo | null>(initial);
