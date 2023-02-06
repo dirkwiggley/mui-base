@@ -19,7 +19,7 @@ import {
 import { styled } from '@mui/material/styles';
 
 import { useAuthContext, UserInfo } from "./AuthStore";
-import { getUsers, getUser, getRoles, RoleType, updateUser } from '../api';
+import API, { authHelper, RoleType, UserInterface, isRole, isUserInterface } from '../api';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -54,6 +54,18 @@ const Users = () => {
 
   let navigate = useNavigate();
 
+  function isRolesArray(obj: any): obj is Array<RoleType> {
+    if (Array.isArray(obj) && (obj.length === 0 || isRole(obj[0])))
+      return true;
+    return false;
+  }
+
+  function isUserArray(obj: any): obj is Array<UserInterface> {
+    if (Array.isArray(obj) && (obj.length === 0 || isUserInterface(obj[0])))
+      return true;
+    return false;
+  }
+
   useEffect(() => {
     if (!auth) {
       navigate("/home");
@@ -74,30 +86,34 @@ const Users = () => {
       }
     }
 
-    getRoles().then(response => {
-      const newRoles: string[] = [];
-      response.forEach(element => {
-        newRoles.push(element.name);
-      });
-      if (newRoles.length > 1) {
-        setRolesList(newRoles);
-      } else {
-        setRolesList(null);
+    authHelper(API.getRoles).then(response => {
+      if (isRolesArray(response)) {
+        const newRoles: string[] = [];
+        response.forEach(element => {
+          newRoles.push(element.name);
+        });
+        if (newRoles.length > 1) {
+          setRolesList(newRoles);
+        } else {
+          setRolesList(null);
+        }
       }
     }).catch(err => {
       console.error(err);
     });
 
-    getUsers().then(response => {
-      const newUsers: JSX.Element[] = [];
-      response.forEach(element => {
-        const elem = <MenuItem key={element.id} value={element.id}>{element.login}({element.nickname})</MenuItem>;
-        newUsers.push(elem);
-      });
-      if (admin) {
-        newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+    authHelper(API.getUsers).then(response => {
+      if (isUserArray(response)) {
+        const newUsers: JSX.Element[] = [];
+        response.forEach(element => {
+          const elem = <MenuItem key={element.id} value={element.id}>{element.login}({element.nickname})</MenuItem>;
+          newUsers.push(elem);
+        });
+        if (admin) {
+          newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+        }
+        setUsers(newUsers);
       }
-      setUsers(newUsers);
     }).catch(err => {
       console.error(err);
     });
@@ -114,15 +130,17 @@ const Users = () => {
   }
 
   const getUsersAndUpdateSelect = () => {
-    getUsers().then(response => {
-      const newUsers = [];
-      response.forEach(element => {
-        newUsers.push(<MenuItem key={element.id} value={element.id}>{element.login}({element.nickname})</MenuItem>);
-      });
-      if (isAdmin()) {
-        newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+    authHelper(API.getUsers).then(response => {
+      if (isUserArray(response)) {
+        const newUsers = [];
+        response.forEach(element => {
+          newUsers.push(<MenuItem key={element.id} value={element.id}>{element.login}({element.nickname})</MenuItem>);
+        });
+        if (isAdmin()) {
+          newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+        }
+        setUsers(newUsers);
       }
-      setUsers(newUsers);
     }).catch(err => {
       console.error(err);
     });
@@ -144,7 +162,7 @@ const Users = () => {
     if (selectedId === "add") {
       resetUser("add");
     } else {
-      getUser(Number(selectedId))
+      authHelper(() => API.getUser(Number(selectedId)))
         .then(response => {
           setLogin(response.login);
           setNickname(response.nickname);
@@ -199,7 +217,7 @@ const Users = () => {
       resetpwd: resetpwd,
       refreshtoken: refreshtoken,
     }
-    updateUser(userInfo)
+    authHelper(() => API.updateUser(userInfo))
       .then(result => {
         // TODO: replace with snackbar
         alert("Success");

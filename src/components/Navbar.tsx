@@ -12,7 +12,7 @@ import { Link as MaterialLink } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { useAuthContext } from "./AuthStore";
-import { logoutApi } from "../api";
+import API from "../api";
 
 import { otherColors } from "../theme";
 
@@ -83,7 +83,7 @@ export default function MenuAppBar() {
       setAuth?.(null);
       setRoles([]);
       setIsAdmin(false);
-      logoutApi(auth.id);
+      API.logoutApi(auth.id);
     }
   };
 

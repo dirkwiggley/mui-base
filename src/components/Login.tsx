@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { Grid, Paper, Typography, TextField, Button, Link as Muilink } from "@mui/material";
-import { loginApi } from '../api';
+import API from '../api';
 import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo } from './AuthStore';
 
 const StyledGrid = styled(Grid, {
@@ -74,7 +74,7 @@ function Login() {
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    loginApi(login, password)
+    API.loginApi(login, password)
       .then(response => {
         // Set Context
         let resp: UserInfo | null = null;

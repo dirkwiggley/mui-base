@@ -1,8 +1,7 @@
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 import CONFIG from "./config";
 
-import { UserInfo } from "./components/AuthStore";
+import { UserInfo, refreshTokenIsString } from "./components/AuthStore";
 
 const axiosJWT = axios.create();
 
@@ -29,394 +28,236 @@ const axiosJWT = axios.create();
 //   }
 // );
 
-export const loginApi = (login: string, pwd: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .post(`${CONFIG.baseDbURL}/auth/`, { login: login, password: pwd }, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          const user = { ...response.data };
-          const roles = JSON.parse(user.roles);
-          user.roles = roles;
-          resolve(user);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
+// export async function authHelper<T>(fn: () => Promise<T>): Promise<void | T> {
+export async function authHelper(fn: () => any) {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (error.response.status === 401) {
+      await API.refreshToken();
+      return fn().catch(async (error: any) => {
+        console.error(error);
+        throw error;
       });
-  });
-};
-
-export const logoutApi = (userId: number) => {
-  return new Promise(function (resolve, reject) {
-    if (!userId) {
-      console.error("Invalid userId");
-      reject("Invalid user id");
     }
-    axios
-      .delete(`${CONFIG.baseDbURL}/auth/logout/${userId}`) 
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
+  }
+}
+
+export interface RoleType {
+  id: number,
+  name: string,
+}
+
+export interface UserInterface {
+  id: number;
+  login: string;
+  nickname: string;
+  email: string;
+  roles: string;
+  active: number;
+  resetpwd: number;
+}
+
+export const isRole = (arg: any): arg is RoleType => {
+  return arg && arg.id && typeof(arg.id) === 'number' 
+    && arg.name && typeof(arg.name) === 'string';
+}
+
+export const isUserInterface = (arg: any): arg is UserInterface => {
+  return arg && arg.id && typeof(arg.id) === 'number' 
+    && arg.login && typeof(arg.login) === 'string';
+}
+
+export default class API {
+  static accessToken = null;
+
+  static loginApi = (login: String, pwd: String) => {
+    return new Promise(function (resolve, reject) {
+      axios
+        .post(
+          `${CONFIG.baseDbURL}/auth/`,
+          { login: login, password: pwd },
+          { withCredentials: true }
+        )
+        .then((response) => {
+          if (response.data.error) {
+            reject(response.data.error);
+          } else {
+            const user = { ...response.data };
+            const roles = JSON.parse(user.roles);
+            user.roles = roles;
+            API.accessToken = user.accessToken;
+            delete user.accessToken;
+            resolve(user);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          reject(err);
+        });
+    });
+  };
+
+  static logoutApi = (userId: number | undefined) => {
+    if (!userId) return;
+    return new Promise(function (resolve, reject) {
+      axios.delete(`${CONFIG.baseDbURL}/auth/logout/${userId}`).catch((err) => {
         console.error(err);
-        reject(err);
       });
-  });
-};
+    });
+  };
 
-export const refreshToken = (accessToken: string) => {
-  const params = { accessToken: accessToken };
-  return new Promise(function (resolve, reject) {
-    axios
-      .post(`${CONFIG.baseDbURL}/auth/refresh/`, params)
-      .then((response) => {
-        resolve("");
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static refreshToken = async () => {
+    const params = { accessToken: API.accessToken };
+    return await axios.post(`${CONFIG.baseDbURL}/auth/refresh/`, params);
+  };
 
-export const getUsers = () => {
-  const accessToken = localStorage.getItem("accessToken");
-  return new Promise<UserInfo[]>(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/users/`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response.data.users);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static getUsers = async () => {
+    const response = await axios.get(`${CONFIG.baseDbURL}/users/`, { withCredentials: true });
+    if (!response.data.error) {
+      return response?.data?.users;
+    }
+  };
 
-export const getUser = (userId: number) => {
-  return new Promise<UserInfo>(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/users/id/${userId}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          const user = response.data.user;
-          const roles = JSON.parse(user.roles);
-          user.roles = roles;
-          resolve(response.data.user);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static getUser = async (userId: number) => {
+    const response = await axios.get(`${CONFIG.baseDbURL}/users/id/${userId}`, {
+      withCredentials: true,
+    });
+    if (!response.data.error) {
+      const user = response.data.user;
+      const roles = JSON.parse(user.roles);
+      user.roles = roles;
+      return response.data.user;
+    }
+  };
 
-export interface RoleType { name: string };
+  static getRoles = async () => {
+    const response = await axios.get(`${CONFIG.baseDbURL}/roles/`, { withCredentials: true });
+    if (!response?.data.error) {
+      return response?.data?.roles;
+    }
+  };
 
-export const getRoles = () => {
-  return new Promise<RoleType[]>(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/roles/`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response.data.roles);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static updateUser = (userInfo: any) => {
+    return axios.post(
+      `${CONFIG.baseDbURL}/users/update/`,
+      { userInfo: userInfo },
+      { withCredentials: true }
+    );
+  };
 
-export const updateUser = (userInfo: any) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .post(`${CONFIG.baseDbURL}/users/update/`, { userInfo: userInfo } , { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
-
-export const resetPassword = (userId: string, newPassword: string) => {
-  return new Promise(function (resolve, reject) {
+  static resetPassword = (userId: string, newPassword: string) => {
     const userInfo = { id: userId, password: newPassword };
-    axios
-      .post(`${CONFIG.baseDbURL}/auth/resetpassword/`, userInfo, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+    return axios.post(`${CONFIG.baseDbURL}/auth/resetpassword/`, userInfo, {
+      withCredentials: true,
+    });
+  };
 
-export const getTableData = (tableName: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/dbutils/tabledata/${tableName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static getTableData = async (tableName: string) => {
+    const response = await axios.get(`${CONFIG.baseDbURL}/dbutils/tabledata/${tableName}`, {
+      withCredentials: true,
+    });
+    if (!response?.data.error) {
+      return response.data;
+    }
+  };
 
-export const getTables = () => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/dbutils/tables`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static getTables = async () => {
+    const response = await axios.get(`${CONFIG.baseDbURL}/dbutils/tables`, {
+      withCredentials: true,
+    });
+    if (!response?.data?.error) {
+      return response.data;
+    }
+  };
 
-export const updateElement = (tableName: string, id: string, column: string, value: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/updateelement/${tableName}/${id}/${column}/${value}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static updateElement = (
+    tableName: string,
+    id: string,
+    column: string,
+    value: string
+  ) => {
+    return axios.get(
+      `${CONFIG.baseDbURL}/dbutils/updateelement/${tableName}/${id}/${column}/${value}`,
+      { withCredentials: true }
+    );
+  };
 
-// const url = URL_PREFIX + `/createtable/${tableName}/${columnName}`;
-export const createNewTable = (tableName: string, columnName: string) => {
-  const accessToken = localStorage.getItem("accessToken");
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/createtable/${tableName}/${columnName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/createtable/${tableName}/${columnName}`;
+  static createNewTable = (tableName: string, columnName: string) => {
+    return axios.get(
+      `${CONFIG.baseDbURL}/dbutils/createtable/${tableName}/${columnName}`,
+      { withCredentials: true }
+    );
+  };
 
-// const url = URL_PREFIX + `/droptable/${tableName}`;
-export const dropTable = (tableName: string) => {
-  const accessToken = localStorage.getItem("accessToken");
-  return new Promise(function (resolve, reject) {
-    axios
-      .delete(`${CONFIG.baseDbURL}/dbutils/droptable/${tableName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/droptable/${tableName}`;
+  static dropTable = (tableName: string) => {
+    return axios.delete(`${CONFIG.baseDbURL}/dbutils/droptable/${tableName}`, {
+      withCredentials: true,
+    });
+  };
 
-// const url = URL_PREFIX + `/rename/table/${oldTableName}/${newTableName}`;
-export const renTable = (accessToken: string, oldTableName: string, newTableName: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/rename/table/${oldTableName}/${newTableName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/rename/table/${oldTableName}/${newTableName}`;
+  static renTable = (oldTableName: string, newTableName: string) => {
+    return axios.get(
+      `${CONFIG.baseDbURL}/dbutils/rename/table/${oldTableName}/${newTableName}`,
+      { withCredentials: true }
+    );
+  };
 
-// const url = URL_PREFIX + `/createcolumn/${tableName}/${columnName}`;
-export const createCol = (tableName: string, columnName: string, dataType: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/createcolumn/${tableName}/${columnName}/${dataType}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/createcolumn/${tableName}/${columnName}`;
+  static createCol = (
+    tableName: string,
+    columnName: string,
+    dataType: string
+  ) => {
+    return axios.get(
+      `${CONFIG.baseDbURL}/dbutils/createcolumn/${tableName}/${columnName}/${dataType}`,
+      { withCredentials: true }
+    );
+  };
 
-// const url = URL_PREFIX + `/rename/${tableName}/column/${oldColumnName}/${newColumnName}`;
-export const renameCol = (tableName: string, oldColumnName: string, newColumnName: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/rename/${tableName}/column/${oldColumnName}/${newColumnName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/rename/${tableName}/column/${oldColumnName}/${newColumnName}`;
+  static renameCol = (
+    tableName: string,
+    oldColumnName: string,
+    newColumnName: string
+  ) => {
+    return axios.get(
+      `${CONFIG.baseDbURL}/dbutils/rename/${tableName}/column/${oldColumnName}/${newColumnName}`,
+      { withCredentials: true }
+    );
+  };
 
-// const url = URL_PREFIX + `/insertrow/${currentSelection.tableName}`;
-export const createNewRow = (tableName: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(`${CONFIG.baseDbURL}/dbutils/insertrow/${tableName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + `/insertrow/${currentSelection.tableName}`;
+  static createNewRow = (tableName: string) => {
+    return axios.get(`${CONFIG.baseDbURL}/dbutils/insertrow/${tableName}`, {
+      withCredentials: true,
+    });
+  };
 
-// const url = URL_PREFIX + '/deleterow/:table/:id'
-export const deleteRow = (tableName: string, rowId: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .delete(`${CONFIG.baseDbURL}/dbutils/deleterow/${tableName}/${rowId}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve(response.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  // const url = URL_PREFIX + '/deleterow/:table/:id'
+  static deleteRow = (tableName: string, rowId: string) => {
+    return axios.delete(
+      `${CONFIG.baseDbURL}/dbutils/deleterow/${tableName}/${rowId}`,
+      {
+        withCredentials: true,
+      }
+    );
+  };
 
-//const url = URL_PREFIX + `/dropcolumn/${currentSelection.tableName}/${columnName}`;
-export const dropCol = (tableName: string, columnName: string) => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .delete(
-        `${CONFIG.baseDbURL}/dbutils/dropcolumn/${tableName}/${columnName}`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  //const url = URL_PREFIX + `/dropcolumn/${currentSelection.tableName}/${columnName}`;
+  static dropCol = (tableName: string, columnName: string) => {
+    return axios.delete(
+      `${CONFIG.baseDbURL}/dbutils/dropcolumn/${tableName}/${columnName}`,
+      { withCredentials: true }
+    );
+  };
 
-export const exportDB = () => {
-  return new Promise(function (resolve, reject) {
-    axios
-      .get(
-        `${CONFIG.baseDbURL}/dbutils/export`, { withCredentials: true })
-      .then((response) => {
-        if (response.data.error) {
-          reject(response.data.error);
-        } else {
-          // TODO: Do we want this?
-          console.log(response.data.toString());
-          resolve("");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  });
-};
+  static exportDB = () => {
+    return axios.get(`${CONFIG.baseDbURL}/dbutils/export`, {
+      withCredentials: true,
+    });
+  };
+}

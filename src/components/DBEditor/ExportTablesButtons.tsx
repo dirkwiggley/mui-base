@@ -1,10 +1,10 @@
 import { Box, Button, Grid} from "@mui/material";
-import { exportDB } from '../../api';
+import API, { authHelper } from '../../api';
 
 const ExportTablesButtons = () => {
 
     const exportAll = () => {
-        exportDB();
+        authHelper(API.exportDB);
     }
 
     return (

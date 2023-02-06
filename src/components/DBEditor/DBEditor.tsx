@@ -28,21 +28,9 @@ import AddColumnDialog from "./AddColumnDialog";
 import RemoveColumnDialog from "./RemoveColumnDialog";
 import RenameTableDialog from "./RenameTableDialog";
 import RenameColumnDialog from "./RenameColumnDialog";
-import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo } from '../AuthStore';
+import { useAuthContext } from '../AuthStore';
 
-import {
-  getTables,
-  getTableData,
-  updateElement,
-  createNewTable,
-  dropTable,
-  renTable,
-  createCol,
-  renameCol,
-  createNewRow,
-  deleteRow,
-  dropCol,
-} from "../../api";
+import API, { authHelper } from "../../api";
 import { SelectChangeEvent } from "@mui/material";
 import ExportTablesButtons from "./ExportTablesButtons";
 
@@ -213,30 +201,40 @@ export default function CustomPaginationActionsTable() {
 
   useEffect(() => {
     if (!auth) {
-      navigate("/login");
+      navigate("/login/true");
     }
     try {
       const user = { ...auth };
       if (user && !user.active) {
-        navigate("/login");
+        navigate("/login/true");
       } else if (user.resetpwd) {
         navigate("/resetpassword");
       }
     } catch (err) {
       console.error(err);
-      navigate("/login");
+      navigate("/login/true");
     }
   }, [auth, navigate]);
 
   useEffect(() => {
-    getTables()
+    try {
+      authHelper(API.getTables)
       .then((tableNames) => {
         if (Array.isArray(tableNames)) {
           if (!equalsIgnoreOrder(tables, tableNames)) {
             setTables(tableNames);
           }
         }
+      },
+      (err) => {
+        console.error(err);
+        setAuth?.(null);
+        API.logoutApi(auth?.id);
+        navigate("/login/true");
       });
+    } catch (err) {
+      console.error(err);
+    }
   }, [tables]);
 
   interface HDCC {
@@ -295,40 +293,45 @@ export default function CustomPaginationActionsTable() {
         return;
       }
       const table = currentSelection.tableName;
-      getTableData(table).then((response: any) => {
-        setRows(response.data);
-        let headers: any[] = [];
-        if (Array.isArray(response.columnNames)) {
-          response.columnNames.forEach((element: string, index: number) => {
-            return headers.push(
-              <TableCell
-                component="th"
-                scope="row"
-                key={index}
-                sx={{
-                  bgcolor: "#2F8F9D",
-                  border: "2px",
-                  "&:hover": {
-                    cursor: "pointer",
-                    backgroundColor: "#3BACB6",
-                  },
-                }}
-
-                onDoubleClickCapture={(e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => handleDoubleClickCapture({
-                  event: e,
-                  id: "header",
-                  colName: index.toString(),
-                  value: element,
-                  tableName: currentSelection.tableName
-                })}
-              >
-                {element}
-              </TableCell>
-            );
-          });
-          setColumnHeaders(headers);
-        }
-      });
+      try {
+        authHelper(() => API.getTableData(table)).then((response: any) => {
+          setRows(response.data);
+          let headers: any[] = [];
+          if (Array.isArray(response.columnNames)) {
+            response.columnNames.forEach((element: string, index: number) => {
+              return headers.push(
+                <TableCell
+                  component="th"
+                  scope="row"
+                  key={index}
+                  sx={{
+                    bgcolor: "#2F8F9D",
+                    border: "2px",
+                    "&:hover": {
+                      cursor: "pointer",
+                      backgroundColor: "#3BACB6",
+                    },
+                  }}
+  
+                  onDoubleClickCapture={(e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => handleDoubleClickCapture({
+                    event: e,
+                    id: "header",
+                    colName: index.toString(),
+                    value: element,
+                    tableName: currentSelection.tableName
+                  })}
+                >
+                  {element}
+                </TableCell>
+              );
+            });
+            setColumnHeaders(headers);
+          }
+        });
+      } catch(err) {
+        setAuth?.(null);
+        API.logoutApi(auth?.id);
+      }
     }
   }, [currentSelection, updateTable, handleDoubleClickCapture]);
 
@@ -430,7 +433,8 @@ export default function CustomPaginationActionsTable() {
       return;
     }
     setShowDBEMenu(false);
-    updateElement(currentSelection.tableName, id, column, value)
+    try {
+      authHelper(() => API.updateElement(currentSelection.tableName, id, column, value))
       .then((response) => {
         setCurrentSelection(
           createDefaultCurrentSelection(currentSelection.anchorEl, currentSelection.tableName)
@@ -440,6 +444,10 @@ export default function CustomPaginationActionsTable() {
       .catch((err) => {
         console.log(err);
       });
+    } catch(err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
   };
 
   const showAddTableDialog = (show: boolean) => {
@@ -467,94 +475,119 @@ export default function CustomPaginationActionsTable() {
   };
 
   const createTable = (tableName: string, columnName: string) => {
-    createNewTable(tableName, columnName).then(function (response) {
-      setTables([]);
-      setCurrentSelection(createDefaultCurrentSelection(null, tableName));
-      setUpdateTable(true);
-      setShowDBEMenu(false);
-    });
+    try {
+      authHelper(() => API.createNewTable(tableName, columnName)).then(function (response) {
+        setTables([]);
+        setCurrentSelection(createDefaultCurrentSelection(null, tableName));
+        setUpdateTable(true);
+        setShowDBEMenu(false);
+      });
+    } catch(err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
   };
 
   const deleteTable = (tableName: string) => {
     try {
-      dropTable(tableName).then((result) => {
+      authHelper(() => API.dropTable(tableName)).then((result) => {
         setTables([]);
         setCurrentSelection(createDefaultCurrentSelection(null, ""));
         setUpdateTable(true);
         setShowDBEMenu(false);
       });
     } catch (err) {
-      console.error(err);
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
     }
   };
 
   const renameTable = (oldTableName: string, newTableName: string) => {
-    const accessToken: string | null = localStorage.getItem("accessToken");
-    if (!accessToken) {
-      alert("No access token");
-      return;
+    try {
+      authHelper(() => API.renTable(oldTableName, newTableName)).then((result) => {
+        setTables([]);
+        setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, newTableName));
+        setUpdateTable(true);
+        setShowDBEMenu(false);
+      });
+    } catch (err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
     }
-    renTable(accessToken, oldTableName, newTableName).then((result) => {
-      setTables([]);
-      setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, newTableName));
-      setUpdateTable(true);
-      setShowDBEMenu(false);
-    });
   };
 
   const createColumn = (tableName: string, columnName: string, dataType: string) => {
-    createCol(tableName, columnName, dataType).then((result) => {
-      setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
-      setUpdateTable(true);
-      showCreateColumnDialog(false);
-      setShowDBEMenu(false);
-    });
+    try {
+      authHelper(() => API.createCol(tableName, columnName, dataType)).then((result) => {
+        setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
+        setUpdateTable(true);
+        showCreateColumnDialog(false);
+        setShowDBEMenu(false);
+      });
+    } catch (err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
   };
 
   const renameColumn = (tableName: string, newColumnName: string, oldColumnName: string) => {
-    renameCol(tableName, oldColumnName, newColumnName)
+    try {
+      authHelper(() => API.renameCol(tableName, oldColumnName, newColumnName))
       .then((result) => {
         setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
         setUpdateTable(true);
         setShowDBEMenu(false);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+    } catch (err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
   };
 
   const createDBRow = () => {
-    createNewRow(currentSelection.tableName).then((result) => {
-      setCurrentSelection(
-        createDefaultCurrentSelection(currentSelection.anchorEl, currentSelection.tableName)
-      );
-      setUpdateTable(true);
-      setShowDBEMenu(false);
-    });
-  };
-
-  const deleteDBRow = () => {
-    deleteRow(currentSelection.tableName, currentSelection.id).then(
-      (result) => {
+    try {
+      authHelper(() => API.createNewRow(currentSelection.tableName)).then((result) => {
         setCurrentSelection(
-          createDefaultCurrentSelection(null, currentSelection.tableName)
+          createDefaultCurrentSelection(currentSelection.anchorEl, currentSelection.tableName)
         );
         setUpdateTable(true);
         setShowDBEMenu(false);
-      }
-    );
+      });
+    } catch (err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
+
+  };
+
+  const deleteDBRow = () => {
+    try{
+      authHelper(() => API.deleteRow(currentSelection.tableName, currentSelection.id)).then(
+        (result) => {
+          setCurrentSelection(
+            createDefaultCurrentSelection(null, currentSelection.tableName)
+          );
+          setUpdateTable(true);
+          setShowDBEMenu(false);
+        }
+      );
+    } catch(err) {
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
+    }
   };
 
   const deleteColumn = (columnName: string) => {
     try {
-      dropCol(currentSelection.tableName, columnName).then((result) => {
+      authHelper(() => API.dropCol(currentSelection.tableName, columnName)).then((result) => {
         setCurrentSelection(
           createDefaultCurrentSelection(null, currentSelection.tableName)
         );
         setUpdateTable(true);
       });
     } catch (err) {
-      console.error(err);
+      setAuth?.(null);
+      API.logoutApi(auth?.id);
     } finally {
       setShowDBEMenu(false);
     }

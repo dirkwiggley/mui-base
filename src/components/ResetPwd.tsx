@@ -8,7 +8,7 @@ import { Grid, Paper, Typography, TextField, Button, Link as Muilink, Typography
 import MUITypography, { TypographyProps } from "@mui/material/Typography";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 
-import { resetPassword } from '../api';
+import API, { authHelper } from '../api';
 
 const StyledGrid = styled(Grid)`
   justifyContent: "center",
@@ -87,9 +87,11 @@ function ResetPwd() {
 
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    resetPassword(userId, password).then(response => {
+    authHelper(() => API.resetPassword(userId, password)).then((response: any) => {
+      console.log(response);
+      // TODO: Replace with snackbar
       alert("Success");
-    }).catch(err => {
+    }).catch((err: { response: { status: number; }; }) => {
       if (!err?.response) {
         setErrMsg('No Server Response');
       } else if (err.response?.status === 400) {

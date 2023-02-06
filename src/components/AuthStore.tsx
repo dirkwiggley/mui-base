@@ -12,13 +12,18 @@ export interface UserInfo {
 };
 
 export const instanceofUserInfo = (x: any): boolean => {
-    if (x.id && x.login && x.nickname && x.email && x.roles) 
+    if (x.id && x.login && x.nickname && x.email && x.roles)
         return true;
     else return false;
 }
 
+
+export const refreshTokenIsString = (refreshToken: string | undefined): refreshToken is string => {
+    return typeof refreshToken === "string";
+}
+
 export const convertToUserInfo = (x: any): UserInfo => {
-    let newUserInfo: UserInfo = 
+    let newUserInfo: UserInfo =
     {
         id: x.id,
         login: x.login,
@@ -50,13 +55,13 @@ export type SetAuthStoreType = UseAuthStoreType[1];
 
 const AuthContext = React.createContext<UseAuthStoreType | null>(null);
 
-export const useAuthContext = () => React.useContext(AuthContext)!; 
+export const useAuthContext = () => React.useContext(AuthContext)!;
 
-export const AuthProvider = ({ children }: {children: React.ReactNode}) => (
-        <AuthContext.Provider value={useAuthStore(defaultUserInfo)}>
-            {children}
-        </AuthContext.Provider>
- );
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => (
+    <AuthContext.Provider value={useAuthStore(defaultUserInfo)}>
+        {children}
+    </AuthContext.Provider>
+);
 
 
 
