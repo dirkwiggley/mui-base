@@ -123,7 +123,7 @@ export default class API {
     const response = await axios.get(`${CONFIG.baseDbURL}/users/id/${userId}`, {
       withCredentials: true,
     });
-    if (!response.data.error) {
+    if (!response?.data.error) {
       const user = response.data.user;
       const roles = JSON.parse(user.roles);
       user.roles = roles;
@@ -138,12 +138,17 @@ export default class API {
     }
   };
 
-  static updateUser = (userInfo: any) => {
-    return axios.post(
+  static updateUser = async (userInfo: any) => {
+    const response = await axios.post(
       `${CONFIG.baseDbURL}/users/update/`,
       { userInfo: userInfo },
       { withCredentials: true }
     );
+    if (response.status === 204) {
+      return("SUCCESS");
+    } else {
+      return ("FAIL");
+    }
   };
 
   static resetPassword = (userId: string, newPassword: string) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FormControl,
@@ -14,12 +14,15 @@ import {
   Stack,
   InputLabel,
   Typography,
-  SelectChangeEvent
+  SelectChangeEvent,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 
 import { useAuthContext, UserInfo } from "./AuthStore";
 import API, { authHelper, RoleType, UserInterface, isRole, isUserInterface } from '../api';
+import { AlertColor } from '@mui/material/Alert';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -51,6 +54,9 @@ const Users = () => {
   const [resetpwd, setResetpwd] = useState<boolean>(false);
   const [refreshtoken, setRefreshToken] = useState<string | undefined>("");
   const [rolesList, setRolesList] = useState<string[] | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<AlertColor>("error");
+  const [snackbarMsg, setSnackbarMsg] = useState<string>("");
 
   let navigate = useNavigate();
 
@@ -153,7 +159,8 @@ const Users = () => {
     setEmail("");
     setRoles(null);
     setActive(false);
-    setResetpwd(false);
+    setResetpwd(true);
+    setRefreshToken("");
   }
 
   const handleSelectUser = (event: SelectChangeEvent<unknown>) => {
@@ -170,8 +177,11 @@ const Users = () => {
           setRoles(response.roles);
           setActive(response.active);
           setResetpwd(response.resetpwd);
+          setRefreshToken(response.refreshtoken);
         }).catch(err => {
-          alert("Error handling incomplete");
+          setSnackbarType("error");
+          setSnackbarMsg("Error getting user data");
+          setOpenSnackbar(true);
           resetUser();
         });
     }
@@ -219,14 +229,23 @@ const Users = () => {
     }
     authHelper(() => API.updateUser(userInfo))
       .then(result => {
-        // TODO: replace with snackbar
-        alert("Success");
-        if (userInfo.id === auth?.id) {
-          setAuth(userInfo);
-        };
+        if (result === "SUCCESS") {
+          setSnackbarType("success");
+          setSnackbarMsg("Update Success");
+          setOpenSnackbar(true);
+          if (userInfo.id === auth?.id) {
+            setAuth(userInfo);
+          };
+        } else {
+          setSnackbarType("error");
+          setSnackbarMsg("Update Failure");
+          setOpenSnackbar(true);
+        }
         getUsersAndUpdateSelect();
       }).catch(err => {
-        alert(err);
+        setSnackbarType("error");
+        setSnackbarMsg("Update Failure");
+        setOpenSnackbar(true);
       });
   }
 
@@ -243,7 +262,9 @@ const Users = () => {
     } else if (elementName === "emailInput") {
       setEmail(value);
     } else {
-      alert("Invalid document element");
+      setSnackbarType("error");
+      setSnackbarMsg("Input Error - Invalid Input");
+      setOpenSnackbar(true);
     }
   }
 
@@ -265,12 +286,27 @@ const Users = () => {
     }
   };
 
-  const isCheckedRole = (option: string) : boolean => {
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  }
+
+  const getSnackbar = () => {
+    return (
+      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarType} sx={{ width: '100%'}}>{snackbarMsg}</Alert>
+      </Snackbar>
+    );
+  }
+
+  const isCheckedRole = (option: string): boolean => {
     if (!jsRoles) {
       return true;
     } else if (jsRoles.includes(option)) {
       return true;
-    } 
+    }
     return false;
   }
 
@@ -291,9 +327,11 @@ const Users = () => {
         width: '90%',
         mt: 2
       }}>
+      {getSnackbar()}
       <StyledPaper square={false} >
         <Stack spacing={1}>
           <StackItem><h3>Edit User</h3></StackItem>
+            
           <StackItem>
             <FormControl variant="filled" fullWidth>
               <InputLabel id="select-label">User</InputLabel>
