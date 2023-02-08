@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuthContext } from "./AuthStore";
 import { useNavigate } from 'react-router-dom';
 import styled from "@emotion/styled";
-import { Grid, Paper, Typography, TextField, Button, Link as Muilink, TypographyTypeMap } from "@mui/material";
+import { Grid, Paper, Typography, TextField, Button, Link as Muilink, TypographyTypeMap, AlertColor, Alert, Snackbar } from "@mui/material";
 
 import MUITypography, { TypographyProps } from "@mui/material/Typography";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
@@ -39,7 +39,7 @@ const OffscreenTypography = styled(Typography)`
 
 function ResetPwd() {
   const errRef = useRef<React.ForwardedRef<HTMLSpanElement> | null | undefined>();
-  
+
   const [auth, setAuth] = useAuthContext();
   const [roles, setRoles] = useState<string[]>([]);
   const [userId, setUserId] = useState<string>("");
@@ -47,6 +47,9 @@ function ResetPwd() {
   const [password, setPassword] = useState<string>("")
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errMsg, setErrMsg] = useState<string>("");
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<AlertColor>("error");
+  const [snackbarMsg, setSnackbarMsg] = useState<string>("");
 
 
   let navigate = useNavigate();
@@ -65,7 +68,7 @@ function ResetPwd() {
     }
   }, [auth]);
 
-  const changePassword : ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const changePassword: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newPwd = event.target.value;
     setPassword(newPwd);
     if (newPwd !== confirmPassword) {
@@ -75,7 +78,7 @@ function ResetPwd() {
     }
   }
 
-  const changeConfirmPassword  : ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const changeConfirmPassword: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newConfPwd = event.target.value;
     setConfirmPassword(newConfPwd);
     if (password !== newConfPwd) {
@@ -89,8 +92,9 @@ function ResetPwd() {
     event.preventDefault();
     authHelper(() => API.resetPassword(userId, password)).then((response: any) => {
       console.log(response);
-      // TODO: Replace with snackbar
-      alert("Success");
+      setSnackbarType("success");
+      setSnackbarMsg("Reset Success");
+      setOpenSnackbar(true);
     }).catch((err: { response: { status: number; }; }) => {
       if (!err?.response) {
         setErrMsg('No Server Response');
@@ -106,6 +110,21 @@ function ResetPwd() {
     navigate('/login/true');
   }
 
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  }
+
+  const getSnackbar = () => {
+    return (
+      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarType} sx={{ width: '100%' }}>{snackbarMsg}</Alert>
+      </Snackbar>
+    );
+  }
+
   // const EMT = styled('span')<typeof Typography>(
   //   {
   //     color: "red",
@@ -118,56 +137,59 @@ function ResetPwd() {
   //   })
   // )
   return (
-    <Grid container spacing={0} justifyContent="center" direction="row">
-      <Grid item sx={{ mt: 25 }}>
-        <StyledGrid container direction="column" justifyContent="center" spacing={2} >
-          <StyledPaper variant="elevation" elevation={2} >
-            <Grid item>
-              {errMsg ? <ErrMsgTypography /*ref={errRef}*/ aria-live="assertive" >{errMsg}</ErrMsgTypography> : <OffscreenTypography /*ref={errRef}*/ aria-live="assertive" />}
-            </Grid>
-            <Grid item>
-              <Typography component="h1" variant="h5">Reset Password</Typography>
-            </Grid>
-            <Grid item>
-              <form onSubmit={handleSubmit}>
-                <Grid container direction="column" spacing={2}>
-                  <Grid item>
-                    <TextField
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      variant="outlined"
-                      value={password}
-                      onChange={changePassword}
-                      required 
-                      sx={{ width: "100%" }} />
+    <>
+      {getSnackbar()}
+      <Grid container spacing={0} justifyContent="center" direction="row">
+        <Grid item sx={{ mt: 25 }}>
+          <StyledGrid container direction="column" justifyContent="center" spacing={2} >
+            <StyledPaper variant="elevation" elevation={2} >
+              <Grid item>
+                {errMsg ? <ErrMsgTypography /*ref={errRef}*/ aria-live="assertive" >{errMsg}</ErrMsgTypography> : <OffscreenTypography /*ref={errRef}*/ aria-live="assertive" />}
+              </Grid>
+              <Grid item>
+                <Typography component="h1" variant="h5">Reset Password</Typography>
+              </Grid>
+              <Grid item>
+                <form onSubmit={handleSubmit}>
+                  <Grid container direction="column" spacing={2}>
+                    <Grid item>
+                      <TextField
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        variant="outlined"
+                        value={password}
+                        onChange={changePassword}
+                        required
+                        sx={{ width: "100%" }} />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirm Password"
+                        variant="outlined"
+                        value={confirmPassword}
+                        onChange={changeConfirmPassword}
+                        required
+                        sx={{ width: "100%" }} />
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={errMsg !== ""}
+                        sx={{ width: "100%" }} >Submit</Button>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <TextField
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm Password"
-                      variant="outlined"
-                      value={confirmPassword}
-                      onChange={changeConfirmPassword}
-                      required 
-                      sx={{ width: "100%" }} />
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      disabled={errMsg !== ""}
-                      sx={{ width: "100%" }} >Submit</Button>
-                  </Grid>
-                </Grid>
-              </form>
-            </Grid>
-          </StyledPaper >
-        </StyledGrid >
+                </form>
+              </Grid>
+            </StyledPaper >
+          </StyledGrid >
+        </Grid >
       </Grid >
-    </Grid >
+    </>
   );
 }
 

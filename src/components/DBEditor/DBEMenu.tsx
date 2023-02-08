@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { TextField, Tooltip, Box, Menu, MenuItem } from "@mui/material";
+import { TextField, Tooltip, Box, Menu, MenuItem, Alert, AlertColor, Snackbar } from "@mui/material";
 import { styled } from "@mui/system";
 
 import { CurrentSelection } from "./DBEditor";
@@ -91,6 +91,9 @@ function DBEMenu({
   const [open, setOpen] = useState(openMenuValue);
   const [addNewRowFn, setAddNewRow] = useState(addNewRow);
   const [removeRowFn, setRemoveRow] = useState(removeRow);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarType, setSnackbarType] = useState<AlertColor>("error");
+  const [snackbarMsg, setSnackbarMsg] = useState<string>("");
 
   useEffect(() => {
     setOpen(open);
@@ -114,7 +117,9 @@ function DBEMenu({
 
   const createAddRemoveRow = () => {
     if (!anchorEl) {
-      alert("No anchor element");
+      setSnackbarType("error");
+      setSnackbarMsg("No Anchor Error");
+      setOpenSnackbar(true);
       return;
     }
     return (
@@ -148,7 +153,7 @@ function DBEMenu({
 
   const createHeaderMenu = (key: string) => {
     if (!anchorEl) {
-      alert("No anchor element");
+      console.error("No anchor element");
       return;
     }
     const ON_HEADER_ROW = "header";
@@ -243,9 +248,6 @@ function DBEMenu({
   };
 
   const createRowDataEditor = (columnName: string) => {
-    // if (!anchorEl) {
-    //   alert("No bueno");
-    // }
     if (columnName !== "id") {
       return (
         <StyledBox
@@ -291,7 +293,27 @@ function DBEMenu({
     }
   };
 
-  return <div>{getPopup()}</div>;
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  }
+
+  const getSnackbar = () => {
+    return (
+      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarType} sx={{ width: '100%' }}>{snackbarMsg}</Alert>
+      </Snackbar>
+    );
+  }
+
+  return (
+    <div>
+      {getSnackbar()}
+      {getPopup()}
+    </div>
+  );
 }
 
 export default DBEMenu;
