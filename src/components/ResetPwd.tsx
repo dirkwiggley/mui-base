@@ -51,7 +51,6 @@ function ResetPwd() {
   const [snackbarType, setSnackbarType] = useState<AlertColor>("error");
   const [snackbarMsg, setSnackbarMsg] = useState<string>("");
 
-
   let navigate = useNavigate();
 
   useEffect(() => {

@@ -19,6 +19,8 @@ const NonMobileBox = styled(Box)(({ theme }) => ({
   display: "flex",
   flex: 1,
   alignItems: "center",
+  bottom: 0,
+  position: "fixed",
   [theme.breakpoints.down("sm")]: {
     display: "none",
   },
