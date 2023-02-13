@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
-import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
@@ -12,11 +10,6 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import LastPageIcon from "@mui/icons-material/LastPage";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 
@@ -29,6 +22,7 @@ import RemoveColumnDialog from "./RemoveColumnDialog";
 import RenameTableDialog from "./RenameTableDialog";
 import RenameColumnDialog from "./RenameColumnDialog";
 import { useAuthContext } from '../AuthStore';
+import { TablePaginationActions } from "./TablePaginationActions";
 
 import API, { authHelper } from "../../api";
 import { SelectChangeEvent } from "@mui/material";
@@ -41,91 +35,6 @@ export interface CurrentSelection {
   tableName: string,
   anchorEl: HTMLElement | null
 };
-
-interface TPActionsProps {
-  count: number,
-  page: number,
-  rowsPerPage: number,
-  onPageChange: Function
-}
-
-function TablePaginationActions(props: TPActionsProps) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = (event: any) => {
-    onPageChange(event, 0);
-  };
-
-  const handleBackButtonClick = (event: any) => {
-    onPageChange(event, page - 1);
-  };
-
-  const handleNextButtonClick = (event: any) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (event: any) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowRight />
-        ) : (
-          <KeyboardArrowLeft />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowLeft />
-        ) : (
-          <KeyboardArrowRight />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
-}
-
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
-
-// const StyledIdTableCell = styled(TableCell, {
-//   name: "StyledIdTableCell",
-//   slot: "Wrapper",
-// })({
-//   "&:hover": {
-//     backgroundColor: "background.lightGray",
-//   },
-// });
 
 const StyledTableCell = styled(TableCell, {
   name: "StyledTableCell",
