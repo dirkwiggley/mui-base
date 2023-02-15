@@ -129,10 +129,10 @@ function DBEMenu({
         }}
         id="addremove"
         anchorEl={anchorEl}
-        anchorPosition={{
-          top: xPos,
-          left: yPos,
-        }}
+        // anchorPosition={{
+        //   top: xPos,
+        //   left: yPos,
+        // }}
         anchorOrigin={{
           vertical: "top",
           horizontal: "center",
@@ -165,10 +165,6 @@ function DBEMenu({
           }}
           id="header"
           anchorEl={anchorEl}
-          // anchorPosition={{
-          //   top: xPos,
-          //   left: yPos,
-          // }}
           anchorOrigin={{
             vertical: "top",
             horizontal: "center",
@@ -205,10 +201,6 @@ function DBEMenu({
       return (
         <Menu
           anchorEl={anchorEl}
-          // anchorPosition={{
-          //   top: xPos,
-          //   left: yPos,
-          // }}
           anchorOrigin={{
             vertical: "top",
             horizontal: "center",

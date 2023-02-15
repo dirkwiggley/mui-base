@@ -48,15 +48,6 @@ const StyledTableCell = styled(TableCell, {
   },
 });
 
-const StyledTableHeaderGrid = styled(Grid, {
-  name: "StyledTableHeaderGrid",
-  slot: "Wrapper",
-})({
-  marginTop: "50px",
-  backgroundColor: "lightGray",
-  padding: 4,
-});
-
 const StyledHeaderGrid = styled(Box)({
   marginTop: "50px",
   padding: 4,
@@ -153,10 +144,11 @@ export default function CustomPaginationActionsTable() {
     value: string | ReactNode,
     tableName: string
   }
+
   const handleDoubleClickCapture = useCallback(
     ({ event, id, colName, value, tableName }: HDCC) => {
       event?.preventDefault();
-      let anchor = event.nativeEvent.currentTarget; //event.target;
+      let anchor = event.currentTarget;
       let columnName: string = colName;
       if (id === "header") {
         if (typeof value === "string") {
@@ -179,16 +171,11 @@ export default function CustomPaginationActionsTable() {
       };
       setCurrentSelection(newCS);
 
-      // const pos = getPosition(event?.currentTarget);
-      // if (pos.x !== 0 && pos.y !== 0) {
       setAnchorPoint({
-        // x: pos.x,
-        // y: pos.y,
         x: event.pageX,
         y: event.pageY,
-        anchorEl: event?.currentTarget, //(event.nativeEvent.currentTarget as HTMLTableCellElement), 
+        anchorEl: event?.currentTarget, 
       });
-      // }
       setShowDBEMenu(!showDBEMenu);
     },
     [setAnchorPoint, setShowDBEMenu, showDBEMenu]
