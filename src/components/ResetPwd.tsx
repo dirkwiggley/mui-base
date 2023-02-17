@@ -90,13 +90,19 @@ function ResetPwd() {
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
     authHelper(() => API.resetPassword(userId, password)).then((response: any) => {
-      console.log(response);
-      setSnackbarType("success");
-      setSnackbarMsg("Reset Success");
-      setOpenSnackbar(true);
+      if (response === "SUCCESS") {
+        navigate('/login/true');
+      } else {
+        setSnackbarType("error");
+        setSnackbarMsg("Reset Failure");
+        setOpenSnackbar(true);
+      }
     }).catch((err: { response: { status: number; }; }) => {
       if (!err?.response) {
         setErrMsg('No Server Response');
+        setSnackbarType("error");
+        setSnackbarMsg("No Server Response");
+        setOpenSnackbar(true);
       } else if (err.response?.status === 400) {
         setErrMsg('Missing Password');
       } else if (err.response?.status === 401) {
@@ -105,8 +111,6 @@ function ResetPwd() {
         setErrMsg('Login Failed');
       }
     });
-
-    navigate('/login/true');
   }
 
   const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -118,7 +122,7 @@ function ResetPwd() {
 
   const getSnackbar = () => {
     return (
-      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={4000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbarType} sx={{ width: '100%' }}>{snackbarMsg}</Alert>
       </Snackbar>
     );

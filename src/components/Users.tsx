@@ -295,7 +295,7 @@ const Users = () => {
 
   const getSnackbar = () => {
     return (
-      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+      <Snackbar anchorOrigin={{ "vertical": "top", "horizontal": "center" }} open={openSnackbar} autoHideDuration={4000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbarType} sx={{ width: '100%'}}>{snackbarMsg}</Alert>
       </Snackbar>
     );

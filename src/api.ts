@@ -29,6 +29,10 @@ const axiosJWT = axios.create();
 // );
 
 // export async function authHelper<T>(fn: () => Promise<T>): Promise<void | T> {
+
+const SUCCESS: string = "SUCCESS";
+const FAIL: string = "FAIL";
+
 export async function authHelper(fn: () => any) {
   try {
     return await fn();
@@ -44,8 +48,8 @@ export async function authHelper(fn: () => any) {
 }
 
 export interface RoleType {
-  id: number,
-  name: string,
+  id: number;
+  name: string;
 }
 
 export interface UserInterface {
@@ -59,14 +63,24 @@ export interface UserInterface {
 }
 
 export const isRole = (arg: any): arg is RoleType => {
-  return arg && arg.id && typeof(arg.id) === 'number' 
-    && arg.name && typeof(arg.name) === 'string';
-}
+  return (
+    arg &&
+    arg.id &&
+    typeof arg.id === "number" &&
+    arg.name &&
+    typeof arg.name === "string"
+  );
+};
 
 export const isUserInterface = (arg: any): arg is UserInterface => {
-  return arg && arg.id && typeof(arg.id) === 'number' 
-    && arg.login && typeof(arg.login) === 'string';
-}
+  return (
+    arg &&
+    arg.id &&
+    typeof arg.id === "number" &&
+    arg.login &&
+    typeof arg.login === "string"
+  );
+};
 
 export default class API {
   static accessToken = null;
@@ -113,7 +127,9 @@ export default class API {
   };
 
   static getUsers = async () => {
-    const response = await axios.get(`${CONFIG.baseDbURL}/users/`, { withCredentials: true });
+    const response = await axios.get(`${CONFIG.baseDbURL}/users/`, {
+      withCredentials: true,
+    });
     if (!response.data.error) {
       return response?.data?.users;
     }
@@ -132,7 +148,9 @@ export default class API {
   };
 
   static getRoles = async () => {
-    const response = await axios.get(`${CONFIG.baseDbURL}/roles/`, { withCredentials: true });
+    const response = await axios.get(`${CONFIG.baseDbURL}/roles/`, {
+      withCredentials: true,
+    });
     if (!response?.data.error) {
       return response?.data?.roles;
     }
@@ -145,23 +163,32 @@ export default class API {
       { withCredentials: true }
     );
     if (response.status === 204) {
-      return("SUCCESS");
+      return SUCCESS;
     } else {
-      return ("FAIL");
+      return FAIL;
     }
   };
 
-  static resetPassword = (userId: string, newPassword: string) => {
+  static resetPassword = async (userId: string, newPassword: string) => {
     const userInfo = { id: userId, password: newPassword };
-    return axios.post(`${CONFIG.baseDbURL}/auth/resetpassword/`, userInfo, {
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${CONFIG.baseDbURL}/auth/resetpassword/`, userInfo, {
+        withCredentials: true,
+      });
+      if (response.status === 204) {
+        return SUCCESS;
+      } else {
+        return FAIL;
+      }
   };
 
   static getTableData = async (tableName: string) => {
-    const response = await axios.get(`${CONFIG.baseDbURL}/dbutils/tabledata/${tableName}`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${CONFIG.baseDbURL}/dbutils/tabledata/${tableName}`,
+      {
+        withCredentials: true,
+      }
+    );
     if (!response?.data.error) {
       return response.data;
     }
