@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { Grid, Paper, Typography, TextField, Button, Link as Muilink } from "@mui/material";
 import API from '../api';
-import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo } from './AuthStore';
+import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
 
 const StyledGrid = styled(Grid, {
   name: "StyledGrid",
@@ -81,7 +81,15 @@ function Login() {
         if (instanceofUserInfo(response)) {
           resp = convertToUserInfo(response);
         }
-        setAuth(resp);
+        if (resp?.resetpwd) {
+          // We need to keep the userId for the reset
+          let defaultUser = defaultUserInfo;
+          defaultUser.id = resp.id;
+          // We need to invalidate the login data if the user needs to reset their password
+          setAuth(defaultUser);
+        } else {
+          setAuth(resp);
+        }
         setLogin('');
         setPassword('');
         setShow(false);

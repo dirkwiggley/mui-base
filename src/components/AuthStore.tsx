@@ -37,7 +37,7 @@ export const convertToUserInfo = (x: any): UserInfo => {
     return newUserInfo;
 }
 
-const defaultUserInfo: UserInfo = {
+export const defaultUserInfo: UserInfo = {
     id: 0,
     login: "nobody",
     nickname: "nobody",
