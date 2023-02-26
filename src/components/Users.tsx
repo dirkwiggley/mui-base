@@ -73,9 +73,10 @@ const Users = () => {
   }
 
   useEffect(() => {
-    if (!auth) {
-      navigate("/home");
+    if (!auth || auth.login === "nobody") {
+      navigate("/login/true");
     }
+    
     const admin = auth ? auth.roles.includes('ADMIN') : false;
     if (!admin) {
       navigate("/home");
@@ -123,12 +124,6 @@ const Users = () => {
     }).catch(err => {
       console.error(err);
     });
-  }, [auth, navigate]);
-
-  useEffect(() => {
-    if (!auth) {
-      navigate("/login/true");
-    }
   }, [auth, navigate]);
 
   const isAdmin = () => {

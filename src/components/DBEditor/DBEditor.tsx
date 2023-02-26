@@ -100,7 +100,7 @@ export default function CustomPaginationActionsTable() {
   };
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || auth.login === "nobody") {
       navigate("/login/true");
     }
     try {

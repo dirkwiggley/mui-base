@@ -24,7 +24,7 @@ const Profile = () => {
   let navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || auth.login === "nobody") {
       navigate("/login/true");
     }
   }, [auth, navigate]);
