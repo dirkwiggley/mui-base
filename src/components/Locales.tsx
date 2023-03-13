@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import * as locales from '@mui/material/locale';
-import { Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from './AuthStore';
@@ -45,15 +45,20 @@ export const getCodeFromPrefix = (prefix: string) => {
   return localeElement?.id;
 }
 
+export const getLanguageFromId = (id: string) => {
+  const localeElement = supportedLocales.find(element => element.id === id);
+  return localeElement?.label;
+}
+
 export default function Locales() {
   const { t, i18n } = useTranslation();
 
-  const [ locale, setLocale ] = React.useState<SupportedLocales>(i18n.language as SupportedLocales);
+  const [locale, setLocale] = React.useState<SupportedLocales>(i18n.language as SupportedLocales);
   const [auth, setAuth] = useAuthContext();
-  
+
   React.useEffect(() => {
     if (auth) {
-      i18n.changeLanguage(auth.locale?.slice(0,2));
+      i18n.changeLanguage(auth.locale?.slice(0, 2));
       setLocale(auth.locale as SupportedLocales);
     }
   }, [auth]);
@@ -64,11 +69,11 @@ export default function Locales() {
     () => createTheme(theme, locales[locale]),
     [locale, theme],
   );
-  
+
   const onChangeHandler = (event: any, newValue: string | undefined) => {
     const localCode = getLocaleCode(newValue ? newValue : "");
     if (localCode) {
-      i18n.changeLanguage(localCode?.slice(0,2));
+      i18n.changeLanguage(localCode?.slice(0, 2));
       setLocale(localCode as SupportedLocales);
       if (auth && !(auth.login === 'nobody')) {
         auth.locale = localCode;
@@ -78,36 +83,40 @@ export default function Locales() {
   }
 
   return (
-    <Box sx={{ maxWidth: 'md', mt: 2, ml: 2 }}>
-      <ThemeProvider theme={themeWithLocale}>
-        <Autocomplete
-          aria-label='Language'
-          options={supportedLocales.map((element: localeType) => element.label)} 
-          // getOptionLabel={(key) => `${key.substring(0, 2)}-${key.substring(2, 4)}`}
-          getOptionLabel={(label) => label}
-          style={{ width: 300 }}
-          value={locale}
-          disableClearable
-          // onChange={(event: any, newValue: string | undefined) => {
-          //   i18n.changeLanguage(newValue?.slice(0,2));
-          //   setLocale(newValue as SupportedLocales);
-          // }}
-          onChange={onChangeHandler}
-          renderInput={(params) => (
-            <TextField {...params} label={t('locales.locale')} fullWidth />
-          )}
-        />
-        <TablePagination
+    <ThemeProvider theme={themeWithLocale}>
+      <Stack alignItems="center" justifyContent="center">
+        <Box sx={{ maxWidth: 'md', mt: 2, ml: 2 }}>
+          <Autocomplete
+            aria-label='Language'
+            options={supportedLocales.map((element: localeType) => element.label)}
+            // getOptionLabel={(key) => `${key.substring(0, 2)}-${key.substring(2, 4)}`}
+            getOptionLabel={(label) => label}
+            style={{ width: 300 }}
+            value={locale}
+            disableClearable
+            // onChange={(event: any, newValue: string | undefined) => {
+            //   i18n.changeLanguage(newValue?.slice(0,2));
+            //   setLocale(newValue as SupportedLocales);
+            // }}
+            onChange={onChangeHandler}
+            renderInput={(params) => (
+              <TextField {...params} label={t('locales.locale')} fullWidth />
+            )}
+          />
+          {/* <TablePagination
           count={2000}
           rowsPerPage={10}
           page={1}
           component="div"
           onPageChange={() => {}}
-        />
-        <Typography>
-          {t('locales.test')}
-        </Typography>
-      </ThemeProvider>
-    </Box>
+        /> */}
+        </Box>
+        <Box sx={{ maxWidth: 'md', mt: 2, ml: 2 }}>
+          <Typography>
+            {t('locales.test')}
+          </Typography>
+        </Box>
+      </Stack>
+    </ThemeProvider>
   );
 }

@@ -24,9 +24,9 @@ import { useTranslation } from "react-i18next";
 
 import { useAuthContext, UserInfo } from "./AuthStore";
 import API, { authHelper, RoleType, UserInterface, isRole, isUserInterface } from '../api';
-import { AlertColor } from '@mui/material/Alert';
+import { getLanguageFromId } from "./Locales";
 
-import { supportedLocales, /*getLocalesFromSupportedList, getNativeName*/ } from './Locales';
+import { AlertColor } from '@mui/material/Alert';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -229,7 +229,7 @@ const Users = () => {
       nickname: nickname,
       email: email,
       roles: newRoles,
-      locale: "enUS", /* TODO - UPDATE ME */
+      locale: locale,
       active: active,
       resetpwd: resetpwd,
       refreshtoken: refreshtoken,
@@ -330,6 +330,10 @@ const Users = () => {
     jsRoles = roles;
   }
 
+  const getLang = () => {
+
+  }
+
   return (
     <Box
       display="flex"
@@ -383,6 +387,17 @@ const Users = () => {
             </FormControl>
           </StackItem>
           <StackItem>
+            <FormControl variant="filled" fullWidth>
+              <TextField
+                id="localeInput"
+                label={t('user.locale')}
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                value={getLanguageFromId(locale)}
+                disabled />
+            </FormControl>
+          </StackItem>
+          <StackItem>
             <StyledPaper sx={{ backgroundColor: LIGHT_PAPER_COLOR, width: "100%" }}>
               <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
                 {t('user.roles')}
@@ -396,32 +411,6 @@ const Users = () => {
                 ))}
               </FormControl>
             </StyledPaper>
-          </StackItem>
-          <StackItem>
-            <StyledPaper sx={{ backgroundColor: LIGHT_PAPER_COLOR, width: "100%"}}>
-              <Typography sx={{ display: "flex", ml: 2 }}>
-                {t('user.locale')}
-              </Typography>
-              {/* <FormControl sx={{ width: "100%", ml: 2 }}>
-              <Autocomplete
-                options={Object.keys(locales)}
-                // options={getLocalesFromSupportedList()} TODO: Carry on
-                getOptionLabel={(key) => `${key.substring(0, 2)}-${key.substring(2, 4)}`}
-                // getOptionLabel={(optionValue) => {getNativeName(optionValue)}} TODO: Carry on
-                style={{ width: 300 }}
-                value={locale}
-                disableClearable
-                // onChange={changeLocale}
-                onChange={(event: any, newValue: string | undefined) => {
-                  i18n.changeLanguage(newValue?.slice(0,2));
-                  setLocale(newValue as React.SetStateAction<string>);
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Locale" fullWidth />
-                )}
-              />
-              </FormControl> */}
-            </StyledPaper>        
           </StackItem>
           <StackItem>
             <StyledPaper sx={{ backgroundColor: "#a8e6f0", width: "100%" }}>
