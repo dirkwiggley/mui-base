@@ -2,6 +2,9 @@ import { useRef, useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { Grid, Paper, Typography, TextField, Button, Link as Muilink } from "@mui/material";
+
+import { useTranslation } from "react-i18next";
+
 import API from '../api';
 import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
 
@@ -41,6 +44,7 @@ const OffscreenTypography = styled(Typography, {
 function Login() {  
   const [ auth, setAuth ] = useAuthContext();
 
+  const { t, i18n } = useTranslation();
   const { showLogin } = useParams(); 
 
   const userRef = useRef(null);
@@ -100,13 +104,13 @@ function Login() {
         }
       }).catch(err => {
         if (!err?.response) {
-          setErrMsg('No Server Response');
+          setErrMsg(t('login.noserverresponse') as string);
         } else if (err.response?.status === 400) {
-          setErrMsg('Incorrect Username or Password');
+          setErrMsg(t('login.incorrectusernameorpassword') as string);
         } else if (err.response?.status === 401) {
-          setErrMsg('Unauthorized');
+          setErrMsg(t('login.unauthorized') as string);
         } else {
-          setErrMsg('Login Failed');
+          setErrMsg(t('login.loginfailed') as string);
         }
       });
   }
@@ -121,7 +125,7 @@ function Login() {
               {errMsg === "" ? <OffscreenTypography ref={errRef} aria-live="assertive" /> : <ErrMsgTypography ref={errRef} aria-live="assertive" >{errMsg}</ErrMsgTypography>}
             </Grid>
             <Grid item>
-              <Typography component="h1" variant="h5">Sign in</Typography>
+              <Typography component="h1" variant="h5">{t('login.signin')}</Typography>
             </Grid>
             <Grid item>
               <form onSubmit={handleSubmit}>
@@ -131,7 +135,7 @@ function Login() {
                       id="login"
                       // ref={userRef}
                       type="login"
-                      placeholder="Login"
+                      placeholder={t('login.login') as string}
                       variant="outlined"
                       value={login}
                       onChange={changeLogin}
@@ -143,7 +147,7 @@ function Login() {
                     <TextField
                       id="pwd"
                       type="password"
-                      placeholder="Password"
+                      placeholder={t('login.password') as string}
                       variant="outlined"
                       value={password}
                       onChange={changePassword}
@@ -154,13 +158,13 @@ function Login() {
                       variant="contained"
                       color="primary"
                       type="submit"
-                      sx={{ width: "100%", bgcolor: "background.darkestBlue" }} >Submit</Button>
+                      sx={{ width: "100%", bgcolor: "background.darkestBlue" }} >{t('login.submit')}</Button>
                   </Grid>
                 </Grid>
               </form>
             </Grid>
             <Grid item>
-              <Muilink href="#" variant="body2" sx={{ color: "background.darkestBlue" }}>Forgot Password?</Muilink>
+              <Muilink href="#" variant="body2" sx={{ color: "background.darkestBlue" }}>{t('login.forgotpassword')}</Muilink>
             </Grid>
           </StyledPaper >
         </StyledGrid >

@@ -12,6 +12,11 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
+import { SelectChangeEvent, useTheme } from "@mui/material";
+import * as locales from '@mui/material/locale';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import { useTranslation } from "react-i18next";
 
 import DBSelect from "./DBSelect";
 import DBEMenu from "./DBEMenu";
@@ -23,10 +28,8 @@ import RenameTableDialog from "./RenameTableDialog";
 import RenameColumnDialog from "./RenameColumnDialog";
 import { useAuthContext } from '../AuthStore';
 import { TablePaginationActions } from "./TablePaginationActions";
-
-import API, { authHelper } from "../../api";
-import { SelectChangeEvent } from "@mui/material";
 import ExportTablesButtons from "./ExportTablesButtons";
+import API, { authHelper } from "../../api";
 
 export interface CurrentSelection {
   id: string,
@@ -66,7 +69,11 @@ const defaultAnchorPoint: AnchorPoint = { x: 0, y: 0 }
 
 const currentSelectionSeed: CurrentSelection = { id: "", columnName: "", value: "", tableName: "", anchorEl: null }
 
+type SupportedLocales = keyof typeof locales;
+
 export default function CustomPaginationActionsTable() {
+  const { t, i18n } = useTranslation();
+
   const [auth, setAuth] = useAuthContext();
 
   const [page, setPage] = useState<number>(0);
@@ -87,6 +94,26 @@ export default function CustomPaginationActionsTable() {
   const [updateTable, setUpdateTable] = useState<boolean>(false);
 
   let navigate = useNavigate();
+
+  const theme = useTheme();
+  const [locale, setLocale] = React.useState<SupportedLocales>("enUS" as SupportedLocales);
+
+  useEffect(() => {
+    setLocale(auth?.locale as SupportedLocales);
+  }, [auth?.locale]);
+
+  const themeWithLocale = React.useMemo(
+    () => { 
+      let lang = null;
+      if (auth?.locale) { 
+        lang = locales[auth?.locale! as SupportedLocales];
+      } else {
+        lang = locales[locale];
+      }
+      return createTheme(theme, lang)
+    },
+    [locale, theme],
+  );
 
   const equalsIgnoreOrder = (a: string[], b: string[]) => {
     if (a.length !== b.length) return false;
@@ -119,19 +146,19 @@ export default function CustomPaginationActionsTable() {
   useEffect(() => {
     try {
       authHelper(API.getTables)
-      .then((tableNames) => {
-        if (Array.isArray(tableNames)) {
-          if (!equalsIgnoreOrder(tables, tableNames)) {
-            setTables(tableNames);
+        .then((tableNames) => {
+          if (Array.isArray(tableNames)) {
+            if (!equalsIgnoreOrder(tables, tableNames)) {
+              setTables(tableNames);
+            }
           }
-        }
-      },
-      (err) => {
-        console.error(err);
-        setAuth?.(null);
-        API.logoutApi(auth?.id);
-        navigate("/login/true");
-      });
+        },
+          (err) => {
+            console.error(err);
+            setAuth?.(null);
+            API.logoutApi(auth?.id);
+            navigate("/login/true");
+          });
     } catch (err) {
       console.error(err);
     }
@@ -174,7 +201,7 @@ export default function CustomPaginationActionsTable() {
       setAnchorPoint({
         x: event.pageX,
         y: event.pageY,
-        anchorEl: event?.currentTarget, 
+        anchorEl: event?.currentTarget,
       });
       setShowDBEMenu(!showDBEMenu);
     },
@@ -208,7 +235,7 @@ export default function CustomPaginationActionsTable() {
                       backgroundColor: "#3BACB6",
                     },
                   }}
-  
+
                   onDoubleClickCapture={(e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => handleDoubleClickCapture({
                     event: e,
                     id: "header",
@@ -224,7 +251,7 @@ export default function CustomPaginationActionsTable() {
             setColumnHeaders(headers);
           }
         });
-      } catch(err) {
+      } catch (err) {
         setAuth?.(null);
         API.logoutApi(auth?.id);
       }
@@ -331,16 +358,16 @@ export default function CustomPaginationActionsTable() {
     setShowDBEMenu(false);
     try {
       authHelper(() => API.updateElement(currentSelection.tableName, id, column, value))
-      .then((response) => {
-        setCurrentSelection(
-          createDefaultCurrentSelection(currentSelection.anchorEl, currentSelection.tableName)
-        );
-        setUpdateTable(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    } catch(err) {
+        .then((response) => {
+          setCurrentSelection(
+            createDefaultCurrentSelection(currentSelection.anchorEl, currentSelection.tableName)
+          );
+          setUpdateTable(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
       setAuth?.(null);
       API.logoutApi(auth?.id);
     }
@@ -378,7 +405,7 @@ export default function CustomPaginationActionsTable() {
         setUpdateTable(true);
         setShowDBEMenu(false);
       });
-    } catch(err) {
+    } catch (err) {
       setAuth?.(null);
       API.logoutApi(auth?.id);
     }
@@ -429,11 +456,11 @@ export default function CustomPaginationActionsTable() {
   const renameColumn = (tableName: string, newColumnName: string, oldColumnName: string) => {
     try {
       authHelper(() => API.renameCol(tableName, oldColumnName, newColumnName))
-      .then((result) => {
-        setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
-        setUpdateTable(true);
-        setShowDBEMenu(false);
-      })
+        .then((result) => {
+          setCurrentSelection(createDefaultCurrentSelection(currentSelection.anchorEl, tableName));
+          setUpdateTable(true);
+          setShowDBEMenu(false);
+        })
     } catch (err) {
       setAuth?.(null);
       API.logoutApi(auth?.id);
@@ -457,7 +484,7 @@ export default function CustomPaginationActionsTable() {
   };
 
   const deleteDBRow = () => {
-    try{
+    try {
       authHelper(() => API.deleteRow(currentSelection.tableName, currentSelection.id)).then(
         (result) => {
           setCurrentSelection(
@@ -467,7 +494,7 @@ export default function CustomPaginationActionsTable() {
           setShowDBEMenu(false);
         }
       );
-    } catch(err) {
+    } catch (err) {
       setAuth?.(null);
       API.logoutApi(auth?.id);
     }
@@ -496,246 +523,253 @@ export default function CustomPaginationActionsTable() {
       !Number.isNaN(currentSelection.id)
     ) {
       return (
-        <StyledHeaderGrid>
-          {showDBEMenu ? (
-            <DBEMenu
-              x={anchorPoint.x}
-              y={anchorPoint.y}
-              anchorElement={anchorPoint.anchorEl}
-              ui={() => updateItem}
-              cs={currentSelection}
-              ctd={() => showAddTableDialog}
-              dt={() => setShowRemoveTblDlg}
-              cc={() => showCreateColumnDialog}
-              dc={() => showDeleteColumnDialog}
-              rtd={() => showRenameTableDialog}
-              rcd={() => showRenameColumnDialog}
-              openMenuValue={showDBEMenu}
-              setOpenMenuFn={() => setShowDBEMenu}
-              addNewRow={() => createDBRow}
-              removeRow={() => deleteDBRow}
-            />
-          ) : null}
-          <Grid container>
-            <Grid item xs={4} />
-            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
-              <DBSelect 
-                htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} 
-                tables={tables} 
-                curSel={currentSelection.tableName} />
-              <ExportTablesButtons />
+        <ThemeProvider theme={themeWithLocale}>
+          <StyledHeaderGrid>
+            {showDBEMenu ? (
+              <DBEMenu
+                x={anchorPoint.x}
+                y={anchorPoint.y}
+                anchorElement={anchorPoint.anchorEl}
+                ui={() => updateItem}
+                cs={currentSelection}
+                ctd={() => showAddTableDialog}
+                dt={() => setShowRemoveTblDlg}
+                cc={() => showCreateColumnDialog}
+                dc={() => showDeleteColumnDialog}
+                rtd={() => showRenameTableDialog}
+                rcd={() => showRenameColumnDialog}
+                openMenuValue={showDBEMenu}
+                setOpenMenuFn={() => setShowDBEMenu}
+                addNewRow={() => createDBRow}
+                removeRow={() => deleteDBRow}
+              />
+            ) : null}
+            <Grid container>
+              <Grid item xs={4} />
+              <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+                <DBSelect
+                  htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)}
+                  tables={tables}
+                  curSel={currentSelection.tableName} />
+                <ExportTablesButtons />
+              </Grid>
+              <Grid item xs={4} />
             </Grid>
-            <Grid item xs={4} />
-          </Grid>
-          
-          <Grid item>
-            <TableContainer component={Paper}>
-              <Table
-                sx={{ minWidth: 500 }}
-                aria-label="custom pagination table"
-              >
-                <TableBody>
-                  <TableRow>{columnHeaders}</TableRow>
-                  {hasNoRows() && (
-                    <TableRow style={{ height: 53 * getEmptyRows() }}>
-                      <TableCell colSpan={6}>
-                        No data in table{" "}
-                        <Button onClick={createDBRow} variant="text">
-                          Create a row
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
 
-                  {(rowsPerPage > 0
-                    ? rows.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    : rows
-                  ).map(createRow)}
+            <Grid item>
+              <TableContainer component={Paper}>
+                <Table
+                  sx={{ minWidth: 500 }}
+                  aria-label="custom pagination table"
+                >
+                  <TableBody>
+                    <TableRow>{columnHeaders}</TableRow>
+                    {hasNoRows() && (
+                      <TableRow style={{ height: 53 * getEmptyRows() }}>
+                        <TableCell colSpan={6}>
+                          No data in table{" "}
+                          <Button onClick={createDBRow} variant="text">
+                            Create a row
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )}
 
-                  {getEmptyRows() > 0 && (
-                    <TableRow style={{ height: 53 * getEmptyRows() }}>
-                      <TableCell colSpan={6} />
+                    {(rowsPerPage > 0
+                      ? rows.slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      : rows
+                    ).map(createRow)}
+
+                    {getEmptyRows() > 0 && (
+                      <TableRow style={{ height: 53 * getEmptyRows() }}>
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TablePagination
+                        rowsPerPageOptions={[
+                          5,
+                          10,
+                          25,
+                          { label: "All", value: -1 },
+                        ]}
+                        colSpan={3}
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        lang={locale ? locale : "enUS"}
+                        SelectProps={{
+                          inputProps: {
+                            "aria-label": "rows per page",
+                          },
+                          native: true,
+                        }}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        ActionsComponent={TablePaginationActions}
+                      />
                     </TableRow>
-                  )}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TablePagination
-                      rowsPerPageOptions={[
-                        5,
-                        10,
-                        25,
-                        { label: "All", value: -1 },
-                      ]}
-                      colSpan={3}
-                      count={rows.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      SelectProps={{
-                        inputProps: {
-                          "aria-label": "rows per page",
-                        },
-                        native: true,
-                      }}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      ActionsComponent={TablePaginationActions}
-                    />
-                  </TableRow>
-                </TableFooter>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </StyledHeaderGrid>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </StyledHeaderGrid>
+        </ThemeProvider>
       );
     } else if (rows && currentSelection.tableName) {
       return (
-        <StyledHeaderGrid>
-          {showDBEMenu ? (
-            <DBEMenu
-              x={anchorPoint.x}
-              y={anchorPoint.y}
-              anchorElement={anchorPoint.anchorEl}
-              ui={() => updateItem}
-              cs={currentSelection}
-              ctd={() => showAddTableDialog}
-              dt={() => setShowRemoveTblDlg}
-              cc={() => showCreateColumnDialog}
-              dc={() => showDeleteColumnDialog}
-              rtd={() => showRenameTableDialog}
-              rcd={() => showRenameColumnDialog}
-              openMenuValue={showDBEMenu}
-              setOpenMenuFn={() => setShowDBEMenu}
-              addNewRow={() => { }}
-              removeRow={() => { }}
+        <ThemeProvider theme={themeWithLocale}>
+          <StyledHeaderGrid>
+            {showDBEMenu ? (
+              <DBEMenu
+                x={anchorPoint.x}
+                y={anchorPoint.y}
+                anchorElement={anchorPoint.anchorEl}
+                ui={() => updateItem}
+                cs={currentSelection}
+                ctd={() => showAddTableDialog}
+                dt={() => setShowRemoveTblDlg}
+                cc={() => showCreateColumnDialog}
+                dc={() => showDeleteColumnDialog}
+                rtd={() => showRenameTableDialog}
+                rcd={() => showRenameColumnDialog}
+                openMenuValue={showDBEMenu}
+                setOpenMenuFn={() => setShowDBEMenu}
+                addNewRow={() => { }}
+                removeRow={() => { }}
+              />
+            ) : null}
+            <AddTableDialog
+              openDlg={showAddTblDlg ? showAddTblDlg : false}
+              setOpen={() => showAddTableDialog}
+              createCallback={() => createTable}
             />
-          ) : null}
-          <AddTableDialog
-            openDlg={showAddTblDlg ? showAddTblDlg : false}
-            setOpen={() => showAddTableDialog}
-            createCallback={() => createTable}
-          />
-          <RemoveTableDialog
-            openDlg={showRemoveTblDlg ? showRemoveTblDlg : false}
-            setOpen={() => showRemoveTableDialog}
-            removeCallback={() => deleteTable}
-            name={currentSelection.tableName}
-          />
-          <RenameTableDialog
-            openDlg={showRenameTblDlg ? showRenameTblDlg : false}
-            setOpen={() => showRenameTableDialog}
-            renameCallback={() => renameTable}
-            oldTableName={currentSelection.tableName}
-          />
-          <AddColumnDialog
-            openDlg={showAddColDlg ? showAddColDlg : false}
-            setOpen={() => showCreateColumnDialog}
-            createCallback={() => createColumn}
-            tableName={currentSelection.tableName}
-          />
-          <RemoveColumnDialog
-            openDlg={showDeleteColDlg ? showDeleteColDlg : false}
-            setOpen={() => showDeleteColumnDialog}
-            removeCallback={() => deleteColumn}
-            name={currentSelection ? currentSelection.columnName : ""}
-          />
-          <RenameColumnDialog
-            openDlg={showRenameColDlg ? showRenameColDlg : false}
-            setOpen={() => showRenameColumnDialog}
-            renameCallback={() => renameColumn}
-            tableName={currentSelection.tableName}
-            oldColumnName={currentSelection.columnName}
-          />
+            <RemoveTableDialog
+              openDlg={showRemoveTblDlg ? showRemoveTblDlg : false}
+              setOpen={() => showRemoveTableDialog}
+              removeCallback={() => deleteTable}
+              name={currentSelection.tableName}
+            />
+            <RenameTableDialog
+              openDlg={showRenameTblDlg ? showRenameTblDlg : false}
+              setOpen={() => showRenameTableDialog}
+              renameCallback={() => renameTable}
+              oldTableName={currentSelection.tableName}
+            />
+            <AddColumnDialog
+              openDlg={showAddColDlg ? showAddColDlg : false}
+              setOpen={() => showCreateColumnDialog}
+              createCallback={() => createColumn}
+              tableName={currentSelection.tableName}
+            />
+            <RemoveColumnDialog
+              openDlg={showDeleteColDlg ? showDeleteColDlg : false}
+              setOpen={() => showDeleteColumnDialog}
+              removeCallback={() => deleteColumn}
+              name={currentSelection ? currentSelection.columnName : ""}
+            />
+            <RenameColumnDialog
+              openDlg={showRenameColDlg ? showRenameColDlg : false}
+              setOpen={() => showRenameColumnDialog}
+              renameCallback={() => renameColumn}
+              tableName={currentSelection.tableName}
+              oldColumnName={currentSelection.columnName}
+            />
 
-          <Grid container>
-            <Grid item xs={4} />
-            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
-              <DBSelect 
-                htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} 
-                tables={tables} 
-                curSel={currentSelection.tableName} />
-              <ExportTablesButtons />
+            <Grid container>
+              <Grid item xs={4} />
+              <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+                <DBSelect
+                  htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)}
+                  tables={tables}
+                  curSel={currentSelection.tableName} />
+                <ExportTablesButtons />
+              </Grid>
+              <Grid item xs={4} />
             </Grid>
-            <Grid item xs={4} />
-          </Grid>
-          <Grid item>
-            <TableContainer component={Paper}>
-              <Table
-                sx={{ minWidth: 500 }}
-                aria-label="custom pagination table"
-              >
-                <TableBody>
-                  <TableRow>{columnHeaders}</TableRow>
-                  {hasNoRows() && (
-                    <TableRow style={{ height: 53 * getEmptyRows() }}>
-                      <TableCell colSpan={6}>
-                        No data in table
-                        <Button onClick={createDBRow} variant="text">
-                          Create a row
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
+            <Grid item>
+              <TableContainer component={Paper}>
+                <Table
+                  sx={{ minWidth: 500 }}
+                  aria-label="custom pagination table"
+                >
+                  <TableBody>
+                    <TableRow>{columnHeaders}</TableRow>
+                    {hasNoRows() && (
+                      <TableRow style={{ height: 53 * getEmptyRows() }}>
+                        <TableCell colSpan={6}>
+                          No data in table
+                          <Button onClick={createDBRow} variant="text">
+                            Create a row
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )}
 
-                  {(rowsPerPage > 0
-                    ? rows.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    : rows
-                  ).map(createRow)}
+                    {(rowsPerPage > 0
+                      ? rows.slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      : rows
+                    ).map(createRow)}
 
-                  {getEmptyRows() > 0 && (
-                    <TableRow style={{ height: 53 * getEmptyRows() }}>
-                      <TableCell colSpan={6} />
+                    {getEmptyRows() > 0 && (
+                      <TableRow style={{ height: 53 * getEmptyRows() }}>
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TablePagination
+                        rowsPerPageOptions={[
+                          5,
+                          10,
+                          25,
+                          { label: "All", value: -1 },
+                        ]}
+                        colSpan={3}
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        SelectProps={{
+                          inputProps: {
+                            "aria-label": "rows per page",
+                          },
+                          native: true,
+                        }}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        ActionsComponent={TablePaginationActions}
+                      />
                     </TableRow>
-                  )}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TablePagination
-                      rowsPerPageOptions={[
-                        5,
-                        10,
-                        25,
-                        { label: "All", value: -1 },
-                      ]}
-                      colSpan={3}
-                      count={rows.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      SelectProps={{
-                        inputProps: {
-                          "aria-label": "rows per page",
-                        },
-                        native: true,
-                      }}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      ActionsComponent={TablePaginationActions}
-                    />
-                  </TableRow>
-                </TableFooter>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </StyledHeaderGrid>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </StyledHeaderGrid>
+        </ThemeProvider>
       );
     } else {
       return (
-        <StyledHeaderGrid>
-          <Grid container>
-            <Grid item xs={4} />
-            <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
-              <DBSelect htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} tables={tables} curSel="" />
-              <ExportTablesButtons />
+        <ThemeProvider theme={themeWithLocale}>
+          <StyledHeaderGrid>
+            <Grid container>
+              <Grid item xs={4} />
+              <Grid item xs={4} style={{ display: "flex", gap: "1rem", alignItems: "center", alignContent: "center", justifyContent: "center" }}>
+                <DBSelect htc={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleTableChange(evt, child)} tables={tables} curSel="" />
+                <ExportTablesButtons />
+              </Grid>
+              <Grid item xs={4} />
             </Grid>
-            <Grid item xs={4} />
-          </Grid>
-        </StyledHeaderGrid>
+          </StyledHeaderGrid>
+        </ThemeProvider>
       );
     }
   };

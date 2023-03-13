@@ -7,15 +7,23 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Grid2 from "@mui/material/Unstable_Grid2";
 
+import { useTranslation, Trans } from "react-i18next";
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "./AuthStore";
 
+const lngs: any = {
+  en: { nativeName: 'English' },
+  de: { nativeName: 'Deutsch' }
+};
+
 function Home() {
+  const { t, i18n } = useTranslation();
+
   const [auth, setAuth] = useAuthContext();
   const [roles, setRoles] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showiFrame, setShowiFrame] = useState<boolean>(false);
-
 
   useEffect(() => {
     if (auth) {
@@ -76,21 +84,36 @@ function Home() {
               {showVideo()}
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                  Lizard
+                  {t('home.head')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Lizards are a widespread group of squamate reptiles, with over
-                  6,000 species, ranging across all continents except Antarctica
+                  {t('home.body1')}
+                  {t('home.body2')}
                 </Typography>
               </CardContent>
               <CardActions>
                 <Button onClick={handleClick} size="small">
-                  Learn More
+                  {t('home.action')}
                 </Button>
               </CardActions>
             </Card>
           </Box>
         </Grid2>
+        {/* <Grid2 xs={12}>
+          <Box
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {Object.keys(lngs).map((lng) => (
+              <button key={lng} style={{ fontWeight: i18n.resolvedLanguage === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
+                {lngs[lng].nativeName}
+              </button>
+            ))}
+          </Box>
+        </Grid2> */}
       </Grid2>
     </Box>
   );

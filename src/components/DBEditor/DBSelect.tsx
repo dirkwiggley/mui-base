@@ -7,6 +7,8 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from "@mui/system";
 
+import { useTranslation } from "react-i18next";
+
 interface CurrentSelection {
   id: string,
   columnName: string,
@@ -27,6 +29,8 @@ const StyledBox = styled(Box)({
 });
 
 export default function DBSelect({ htc, tables, curSel }: Props) {
+  const { t, i18n } = useTranslation();
+
   const [handleTableChange] = React.useState(() => htc);
   const [tableList, setTableList] = React.useState(tables);
   const [currentSelection, setCurrentSelection] = React.useState(curSel);
@@ -45,15 +49,18 @@ export default function DBSelect({ htc, tables, curSel }: Props) {
 
   const createMenuItems = () => {
     const elements: any[] = [];
-    tableList.forEach(name => {
-      elements.push(<MenuItem key={name} value={name}>{name}</MenuItem>);
+    tableList.forEach((name, index) => {
+      elements.push(<MenuItem key={name+index.toString()} value={name}>{name}</MenuItem>);
     });
+    if (elements.length === 0) {
+      elements.push(<MenuItem key="none" value=""><em>{t('dbeditor.none')}</em></MenuItem>);
+    }
     return elements;
   }
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }}>
-      <InputLabel id="select-table">Table</InputLabel>
+      <InputLabel id="select-table">{t('dbeditor.table')}</InputLabel>
       <Select
         labelId="select-table"
         id="select-table"
@@ -61,13 +68,10 @@ export default function DBSelect({ htc, tables, curSel }: Props) {
         label="Table"
         onChange={(evt: SelectChangeEvent<string>, child: React.ReactNode) => handleChange(evt, child)}
       >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-        {createMenuItems()}
+      {createMenuItems()}
 
       </Select>
-      <FormHelperText>Select database table</FormHelperText>
+      <FormHelperText>{t('dbeditor.selecttable')}</FormHelperText>
     </FormControl>
   );
 }

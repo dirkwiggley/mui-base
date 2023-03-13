@@ -10,6 +10,7 @@ import Profile from "./components/Profile";
 import Users from "./components/Users";
 import ResetPwd from "./components/ResetPwd";
 import DBEditor from "./components/DBEditor/DBEditor";
+import Locales from "./components/Locales";
 import Exit from "./components/Exit";
 import Footer from "./components/Footer";
 import { AuthProvider } from './components/AuthStore';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/resetpassword" element={<ResetPwd />} />
             <Route path="/dbeditor" element={<DBEditor />} />
+            <Route path="/locales" element={<Locales />} />
             <Route path="/exit" element={<Exit />} />
           </Routes>
           <Footer />

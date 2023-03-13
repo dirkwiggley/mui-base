@@ -11,6 +11,9 @@ import Menu from "@mui/material/Menu";
 import { Link as MaterialLink } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
+
+import { useTranslation, Trans } from "react-i18next";
+
 import { useAuthContext } from "./AuthStore";
 import API from "../api";
 
@@ -34,6 +37,8 @@ const NonMobileBox = styled(Box)(({ theme }) => ({
 }));
 
 export default function MenuAppBar() {
+  const { t, i18n } = useTranslation();
+
   const [auth, setAuth] = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<Element | undefined>();
   const [roles, setRoles] = useState<string[] | undefined>();
@@ -104,13 +109,18 @@ export default function MenuAppBar() {
     handleClose();
     navigate("/about");
   };
-
-  
+ 
   const handleUsers = (event: React.SyntheticEvent) => {
     event.stopPropagation();
     handleClose();
     navigate("/users");
   };
+
+  const handleSetLang = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    handleClose();
+    navigate("/locales");
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -142,15 +152,15 @@ export default function MenuAppBar() {
                 open={Boolean(anchorEl) && menuType === "APP_MENU"}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleHome}>Home</MenuItem>
+                <MenuItem onClick={handleHome}>{t('navbar.home')}</MenuItem>
                 {roles && roles.length > 0 ? (
-                  <MenuItem onClick={handleAbout}>About</MenuItem>
+                  <MenuItem onClick={handleAbout}>{t('navbar.about')}</MenuItem>
                 ) : null}
                 {roles && roles.length > 0 ? (
-                  <MenuItem onClick={handleUsers}>Users</MenuItem>
+                  <MenuItem onClick={handleUsers}>{t('navbar.users')}</MenuItem>
                 ) : null}
                 {roles && roles.length > 0 ? (
-                  <MenuItem onClick={handleProfile}>Profile</MenuItem>
+                  <MenuItem onClick={handleProfile}>{t('navbar.profile')}</MenuItem>
                 ) : null}
               </Menu>
             </Box>
@@ -164,14 +174,14 @@ export default function MenuAppBar() {
               to="/home"
               sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
             >
-              Home
+              {t('navbar.home')}
             </MaterialLink>
             <MaterialLink
               component={RouterLink}
               to="/about"
               sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
             >
-              About
+              {t('navbar.about')}
             </MaterialLink>
             {isAdmin ? (
               <MaterialLink
@@ -179,7 +189,7 @@ export default function MenuAppBar() {
                 to="/users"
                 sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
               >
-                Users
+                {t('navbar.users')}
               </MaterialLink>
             ) : null}
             {isAdmin ? (
@@ -188,7 +198,7 @@ export default function MenuAppBar() {
                 to="/dbeditor"
                 sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
               >
-                DB Editor
+                {t('navbar.dbeditor')}
               </MaterialLink>
             ) : null}
             {roles && roles.length > 0 ? (
@@ -197,7 +207,7 @@ export default function MenuAppBar() {
                 to="/profile"
                 sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
               >
-                Profile
+                {t('navbar.profile')}
               </MaterialLink>
             ) : null}
           </NonMobileBox>
@@ -228,14 +238,15 @@ export default function MenuAppBar() {
               onClose={handleClose}
             >
               {!roles || roles.length === 0 ? (
-                <MenuItem onClick={handleLogin}>Login</MenuItem>
+                <MenuItem onClick={handleLogin}>{t('navbar.login')}</MenuItem>
               ) : null}
               {roles && roles.length > 0 ? (
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>{t('navbar.logout')}</MenuItem>
               ) : null}
               {roles && roles.length > 0 ? (
-                <MenuItem onClick={handleProfile}>Profile</MenuItem>
+                <MenuItem onClick={handleProfile}>{t('navbar.profile')}</MenuItem>
               ) : null}
+              <MenuItem onClick={handleSetLang}>{t('navbar.setlang')}</MenuItem>
             </Menu>
           </Box>
         </Toolbar>

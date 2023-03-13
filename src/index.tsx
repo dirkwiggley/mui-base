@@ -4,8 +4,9 @@ import App from './App';
 import { theme } from "./theme";
 import { styled } from "@mui/material";
 import "./index.css"
-
 import { Box, ThemeProvider } from '@mui/material';
+
+import "./i18n";
 
 const StyledBox = styled(Box)({
   m: 0, 

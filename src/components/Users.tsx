@@ -16,13 +16,17 @@ import {
   Typography,
   SelectChangeEvent,
   Snackbar,
-  Alert
+  Alert,
+  Autocomplete
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
+import { useTranslation } from "react-i18next";
 
 import { useAuthContext, UserInfo } from "./AuthStore";
 import API, { authHelper, RoleType, UserInterface, isRole, isUserInterface } from '../api';
 import { AlertColor } from '@mui/material/Alert';
+
+import { supportedLocales, /*getLocalesFromSupportedList, getNativeName*/ } from './Locales';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -43,6 +47,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const Users = () => {
+  const { t, i18n } = useTranslation();
+
   const [auth, setAuth] = useAuthContext();
   const [users, setUsers] = useState<JSX.Element[]>([]);
   const [userId, setUserId] = useState<string>("");
@@ -50,6 +56,7 @@ const Users = () => {
   const [nickname, setNickname] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [roles, setRoles] = useState<string[] | null>(null);
+  const [locale, setLocale] = useState<string>("enUS");
   const [active, setActive] = useState<boolean>(false);
   const [resetpwd, setResetpwd] = useState<boolean>(false);
   const [refreshtoken, setRefreshToken] = useState<string | undefined>("");
@@ -87,6 +94,7 @@ const Users = () => {
         setNickname(auth.nickname);
         setEmail(auth.email);
         setRoles(auth.roles);
+        setLocale(auth.locale);
         setActive(auth.active);
         setResetpwd(auth.resetpwd);
         setRefreshToken(auth.refreshtoken);
@@ -117,7 +125,7 @@ const Users = () => {
           newUsers.push(elem);
         });
         if (admin) {
-          newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+          newUsers.push(<MenuItem key="add" value="add">{t('user.addauser')}</MenuItem>);
         }
         setUsers(newUsers);
       }
@@ -138,7 +146,7 @@ const Users = () => {
           newUsers.push(<MenuItem key={element.id} value={element.id}>{element.login}({element.nickname})</MenuItem>);
         });
         if (isAdmin()) {
-          newUsers.push(<MenuItem key="add" value="add">Add a user</MenuItem>);
+          newUsers.push(<MenuItem key="add" value="add">{t('user.addauser')}</MenuItem>);
         }
         setUsers(newUsers);
       }
@@ -153,6 +161,7 @@ const Users = () => {
     setNickname("");
     setEmail("");
     setRoles(null);
+    setLocale("enUS");
     setActive(false);
     setResetpwd(true);
     setRefreshToken("");
@@ -170,12 +179,14 @@ const Users = () => {
           setNickname(response.nickname);
           setEmail(response.email);
           setRoles(response.roles);
+          setLocale(response.locale);
           setActive(response.active);
           setResetpwd(response.resetpwd);
           setRefreshToken(response.refreshtoken);
         }).catch(err => {
           setSnackbarType("error");
-          setSnackbarMsg("Error getting user data");
+          const msg = t('user.erroruserdata');
+          setSnackbarMsg(msg);
           setOpenSnackbar(true);
           resetUser();
         });
@@ -218,6 +229,7 @@ const Users = () => {
       nickname: nickname,
       email: email,
       roles: newRoles,
+      locale: "enUS", /* TODO - UPDATE ME */
       active: active,
       resetpwd: resetpwd,
       refreshtoken: refreshtoken,
@@ -226,20 +238,23 @@ const Users = () => {
       .then(result => {
         if (result === "SUCCESS") {
           setSnackbarType("success");
-          setSnackbarMsg("Update Success");
+          const msg = t('user.updatesuccess');
+          setSnackbarMsg(msg);
           setOpenSnackbar(true);
           if (userInfo.id === auth?.id) {
             setAuth(userInfo);
           };
         } else {
           setSnackbarType("error");
-          setSnackbarMsg("Update Failure");
+          const msg = t('user.updatefailure');
+          setSnackbarMsg(msg);
           setOpenSnackbar(true);
         }
         getUsersAndUpdateSelect();
       }).catch(err => {
         setSnackbarType("error");
-        setSnackbarMsg("Update Failure");
+        const msg = t('user.updatefailure');
+        setSnackbarMsg(msg);
         setOpenSnackbar(true);
       });
   }
@@ -258,7 +273,8 @@ const Users = () => {
       setEmail(value);
     } else {
       setSnackbarType("error");
-      setSnackbarMsg("Input Error - Invalid Input");
+      const msg = t('user.inputerror');
+      setSnackbarMsg(msg);
       setOpenSnackbar(true);
     }
   }
@@ -268,7 +284,7 @@ const Users = () => {
       return (
         <TextField
           id="loginInput"
-          label="Login"
+          label={t('user.login')}
           InputLabelProps={{ shrink: true }}
           autoComplete="off"
           value={login}
@@ -276,7 +292,7 @@ const Users = () => {
       );
     } else {
       return (
-        <TextField id="loginInput" variant="filled" value={login} label="Login"></TextField>
+        <TextField id="loginInput" variant="filled" value={login} label={t('user.login')}></TextField>
       );
     }
   };
@@ -320,16 +336,15 @@ const Users = () => {
       justifyContent="Center"
       sx={{
         width: '90%',
-        mt: 2
+        mt: 1
       }}>
       {getSnackbar()}
       <StyledPaper square={false} >
-        <Stack spacing={1}>
-          <StackItem><h3>Edit User</h3></StackItem>
-            
+        <Stack spacing={0}>
+          <StackItem><h3>{t('user.title')}</h3></StackItem>
           <StackItem>
             <FormControl variant="filled" fullWidth>
-              <InputLabel id="select-label">User</InputLabel>
+              <InputLabel id="select-label">{t('user.user')}</InputLabel>
               <Select
                 labelId="select-label"
                 id="select-user"
@@ -349,7 +364,7 @@ const Users = () => {
             <FormControl variant="filled" fullWidth>
               <TextField
                 id="nicknameInput"
-                label="Nickname"
+                label={t('user.nickname')}
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
                 value={nickname}
@@ -360,7 +375,7 @@ const Users = () => {
             <FormControl variant="filled" fullWidth>
               <TextField
                 id="emailInput"
-                label="Email"
+                label={t('user.email')}
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
                 value={email}
@@ -370,7 +385,7 @@ const Users = () => {
           <StackItem>
             <StyledPaper sx={{ backgroundColor: LIGHT_PAPER_COLOR, width: "100%" }}>
               <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
-                Roles
+                {t('user.roles')}
               </Typography>
               <FormControl sx={{ width: "100%", ml: 2 }}>
                 {jsRolesList.map((option) => (
@@ -383,28 +398,54 @@ const Users = () => {
             </StyledPaper>
           </StackItem>
           <StackItem>
+            <StyledPaper sx={{ backgroundColor: LIGHT_PAPER_COLOR, width: "100%"}}>
+              <Typography sx={{ display: "flex", ml: 2 }}>
+                {t('user.locale')}
+              </Typography>
+              {/* <FormControl sx={{ width: "100%", ml: 2 }}>
+              <Autocomplete
+                options={Object.keys(locales)}
+                // options={getLocalesFromSupportedList()} TODO: Carry on
+                getOptionLabel={(key) => `${key.substring(0, 2)}-${key.substring(2, 4)}`}
+                // getOptionLabel={(optionValue) => {getNativeName(optionValue)}} TODO: Carry on
+                style={{ width: 300 }}
+                value={locale}
+                disableClearable
+                // onChange={changeLocale}
+                onChange={(event: any, newValue: string | undefined) => {
+                  i18n.changeLanguage(newValue?.slice(0,2));
+                  setLocale(newValue as React.SetStateAction<string>);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Locale" fullWidth />
+                )}
+              />
+              </FormControl> */}
+            </StyledPaper>        
+          </StackItem>
+          <StackItem>
             <StyledPaper sx={{ backgroundColor: "#a8e6f0", width: "100%" }}>
               <Stack>
                 <StackItem>
                   <Typography sx={{ p: 0, ml: 1 }}>
-                    Misc
+                    {t('user.misc')}
                   </Typography>
                 </StackItem>
                 <StackItem>
                   <FormGroup>
-                    <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label="Active" />
+                    <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
                   </FormGroup>
                 </StackItem>
                 <StackItem>
                   <FormGroup>
-                    <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label="Reset Password" />
+                    <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
                   </FormGroup>
                 </StackItem>
               </Stack>
             </StyledPaper>
           </StackItem>
           <StackItem>
-            <Button variant="contained" onClick={handleUpdate}>Update</Button>
+            <Button variant="contained" onClick={handleUpdate}>{t('user.update')}</Button>
           </StackItem>
         </Stack>
       </StyledPaper>

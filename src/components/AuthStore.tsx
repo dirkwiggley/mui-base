@@ -6,6 +6,7 @@ export interface UserInfo {
     nickname: string;
     email: string;
     roles: string[];
+    locale: string;
     active: boolean;
     resetpwd: boolean;
     refreshtoken?: string;
@@ -30,6 +31,7 @@ export const convertToUserInfo = (x: any): UserInfo => {
         nickname: x.nickname,
         email: x.email,
         roles: x.roles,
+        locale: x.locale,
         active: x.active,
         resetpwd: x.resetpwd,
         refreshtoken: x.refreshtoken
@@ -43,6 +45,7 @@ export const defaultUserInfo: UserInfo = {
     nickname: "nobody",
     email: "default@default.com",
     roles: [],
+    locale: "enUS",
     active: false,
     resetpwd: false,
     refreshtoken: "",
