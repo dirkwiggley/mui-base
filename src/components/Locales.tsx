@@ -70,8 +70,8 @@ export default function Locales() {
     [locale, theme],
   );
 
-  const onChangeHandler = (event: any, newValue: string | undefined) => {
-    const localCode = getLocaleCode(newValue ? newValue : "");
+  const onChangeHandler = (event: any, newValue: localeType) => {
+    const localCode = newValue.id;
     if (localCode) {
       i18n.changeLanguage(localCode?.slice(0, 2));
       setLocale(localCode as SupportedLocales);
@@ -88,11 +88,10 @@ export default function Locales() {
         <Box sx={{ maxWidth: 'md', mt: 2, ml: 2 }}>
           <Autocomplete
             aria-label='Language'
-            options={supportedLocales.map((element: localeType) => element.label)}
-            // getOptionLabel={(key) => `${key.substring(0, 2)}-${key.substring(2, 4)}`}
-            getOptionLabel={(label) => label}
+            options={supportedLocales}
+            getOptionLabel={(element) => element.label}
             style={{ width: 300 }}
-            value={locale}
+            // value={locale}
             disableClearable
             // onChange={(event: any, newValue: string | undefined) => {
             //   i18n.changeLanguage(newValue?.slice(0,2));

@@ -5,6 +5,7 @@ import { Grid, Paper, Typography, Link as Muilink } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "./AuthStore";
+import { getLanguageFromId } from "./Locales";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   justifyContent: "center",
@@ -81,6 +82,9 @@ const Profile = () => {
                   </Grid>
                   <Grid item>
                     <Typography>{t('profile.email')}: {email}</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography>{t('profile.locale')}: {getLanguageFromId(locale)}</Typography>
                   </Grid>
                   <Grid item>
                     <Typography>{t('profile.roles')}: {getRoles()}</Typography>

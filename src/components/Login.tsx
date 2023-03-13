@@ -81,23 +81,25 @@ function Login() {
     API.loginApi(login, password)
       .then(response => {
         // Set Context
-        let resp: UserInfo | null = null;
+        let userInfo: UserInfo | null = null;
         if (instanceofUserInfo(response)) {
-          resp = convertToUserInfo(response);
+          userInfo = convertToUserInfo(response);
+          if (userInfo && userInfo.locale) i18n.changeLanguage(userInfo.locale.slice(0, 2));
         }
-        if (resp?.resetpwd) {
+
+        if (userInfo?.resetpwd) {
           // We need to keep the userId for the reset
           let defaultUser = defaultUserInfo;
-          defaultUser.id = resp.id;
+          defaultUser.id = userInfo.id;
           // We need to invalidate the login data if the user needs to reset their password
           setAuth(defaultUser);
         } else {
-          setAuth(resp);
+          setAuth(userInfo);
         }
         setLogin('');
         setPassword('');
         setShow(false);
-        if (resp?.resetpwd) {
+        if (userInfo?.resetpwd) {
           navigate("/resetpassword"); 
         } else {
           navigate("/home");
