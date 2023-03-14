@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Box, Paper } from "@mui/material";
 import { useAuthStore } from "./AuthStore";
 import { styled } from "@mui/system";
-import { otherColors } from "../theme";
+import { useTranslation } from "react-i18next";
 
+import { otherColors } from "../theme";
 import { useAuthContext } from "./AuthStore";
 
 const paperStyle = {
@@ -32,6 +33,8 @@ function Footer() {
   const [login, setLogin] = useState<string | null>(null);
   const [nickname, setNickname] = useState<string | null>(null);
 
+  const { t, i18n } = useTranslation();
+
   useEffect(() => {
     if (auth) {
       try {
@@ -50,7 +53,7 @@ function Footer() {
     }
   }, [auth, setLogin, setNickname]);
 
-  const out = `User: ${login} (${nickname})`;
+  const out = `${t('footer.user')}: ${login} (${nickname})`;
 
   return (
     <NonMobileBox>

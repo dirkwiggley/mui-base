@@ -85,6 +85,9 @@ i18n
             updatefailure: "Update Failure",
             inputerror: "Input Error - Invalid Input",        
           },
+          footer: {
+            user: "User",
+          }
         },
       },
       de: {
@@ -154,6 +157,9 @@ i18n
             updatefailure: "Aktualisierungsfehler",
             inputerror: "Eingabefehler - Ungültige Eingabe",
           },
+          footer: {
+            user: "Benutzer",
+          }
         },          
       },
       pt: {
@@ -224,6 +230,9 @@ i18n
             updatefailure: "Falha na atualização",
             inputerror: "Erro de entrada - entrada inválida",        
           },
+          footer: {
+            user: "Do utilizador",
+          }
         },
       },
     },
