@@ -2,11 +2,11 @@ import { useRef, useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { Grid, Paper, Typography, TextField, Button, Link as Muilink } from "@mui/material";
-
 import { useTranslation } from "react-i18next";
 
 import API from '../api';
-import { useAuthContext, UserInfo, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
+import { useAuthContext, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
+import { UserInterface } from "../types";
 
 const StyledGrid = styled(Grid, {
   name: "StyledGrid",
@@ -21,7 +21,7 @@ const StyledPaper = styled(Paper, {
   slot: "Wrapper"
 })({
   justifyContent: "center",
-  minHeight: "30vh",
+  minHeight: "22vh",
   padding: "50px",
 });
 
@@ -81,7 +81,7 @@ function Login() {
     API.loginApi(login, password)
       .then(response => {
         // Set Context
-        let userInfo: UserInfo | null = null;
+        let userInfo: UserInterface | null = null;
         if (instanceofUserInfo(response)) {
           userInfo = convertToUserInfo(response);
           if (userInfo && userInfo.locale) i18n.changeLanguage(userInfo.locale.slice(0, 2));

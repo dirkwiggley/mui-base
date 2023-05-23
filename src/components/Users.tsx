@@ -22,10 +22,10 @@ import {
 import { styled } from '@mui/material/styles';
 import { useTranslation } from "react-i18next";
 
-import { useAuthContext, UserInfo } from "./AuthStore";
-import API, { authHelper, RoleType, UserInterface, isRole, isUserInterface } from '../api';
+import { useAuthContext } from "./AuthStore";
+import API, { authHelper, RoleType, isRole, isUserInterface } from '../api';
 import { getLanguageFromId } from "./Locales";
-
+import { UserInterface } from "../types";
 import { AlertColor } from '@mui/material/Alert';
 
 const PAPER_COLOR = "#99d6ff";
@@ -89,6 +89,7 @@ const Users = () => {
       navigate("/home");
     } else {
       if (auth) {
+        const resetPwd = (auth.resetpwd === false) ? false : true;
         setUserId(auth.id.toString());
         setLogin(auth.login);
         setNickname(auth.nickname);
@@ -96,7 +97,7 @@ const Users = () => {
         setRoles(auth.roles);
         setLocale(auth.locale);
         setActive(auth.active);
-        setResetpwd(auth.resetpwd);
+        setResetpwd(resetPwd);
         setRefreshToken(auth.refreshtoken);
       }
     }
@@ -223,7 +224,7 @@ const Users = () => {
 
   const handleUpdate = () => {
     const newRoles: string[] = roles ? roles : [];
-    let userInfo: UserInfo = {
+    let userInfo: UserInterface = {
       id: Number(userId),
       login: login,
       nickname: nickname,

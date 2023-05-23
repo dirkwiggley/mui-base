@@ -1,7 +1,7 @@
 import axios from "axios";
 import CONFIG from "./config";
 
-import { UserInfo, refreshTokenIsString } from "./components/AuthStore";
+import { UserInterface } from "./types";
 
 const axiosJWT = axios.create();
 
@@ -50,16 +50,6 @@ export async function authHelper(fn: () => any) {
 export interface RoleType {
   id: number;
   name: string;
-}
-
-export interface UserInterface {
-  id: number;
-  login: string;
-  nickname: string;
-  email: string;
-  roles: string;
-  active: number;
-  resetpwd: number;
 }
 
 export const isRole = (arg: any): arg is RoleType => {
@@ -156,7 +146,7 @@ export default class API {
     }
   };
 
-  static updateUser = async (userInfo: any) => {
+  static updateUser = async (userInfo: UserInterface) => {
     const response = await axios.post(
       `${CONFIG.baseDbURL}/users/update/`,
       { userInfo: userInfo },

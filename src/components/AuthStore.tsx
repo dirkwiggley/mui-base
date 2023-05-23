@@ -1,16 +1,6 @@
 import * as React from "react";
 
-export interface UserInfo {
-    id: number;
-    login: string;
-    nickname: string;
-    email: string;
-    roles: string[];
-    locale: string;
-    active: boolean;
-    resetpwd: boolean;
-    refreshtoken?: string;
-};
+import { UserInterface } from "../types";
 
 export const instanceofUserInfo = (x: any): boolean => {
     if (x.id && x.login && x.nickname && x.email && x.roles)
@@ -23,8 +13,8 @@ export const refreshTokenIsString = (refreshToken: string | undefined): refreshT
     return typeof refreshToken === "string";
 }
 
-export const convertToUserInfo = (x: any): UserInfo => {
-    let newUserInfo: UserInfo =
+export const convertToUserInfo = (x: any): UserInterface => {
+    let newUserInfo: UserInterface =
     {
         id: x.id,
         login: x.login,
@@ -39,7 +29,7 @@ export const convertToUserInfo = (x: any): UserInfo => {
     return newUserInfo;
 }
 
-export const defaultUserInfo: UserInfo = {
+export const defaultUserInfo: UserInterface = {
     id: 0,
     login: "nobody",
     nickname: "nobody",
@@ -51,7 +41,7 @@ export const defaultUserInfo: UserInfo = {
     refreshtoken: "",
 }
 
-export const useAuthStore = (initial: UserInfo) => React.useState<UserInfo | null>(initial);
+export const useAuthStore = (initial: UserInterface) => React.useState<UserInterface | null>(initial);
 export type UseAuthStoreType = ReturnType<typeof useAuthStore>;
 export type AuthStoreType = UseAuthStoreType[0];
 export type SetAuthStoreType = UseAuthStoreType[1];
