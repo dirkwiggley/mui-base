@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
-import { Grid, Paper, Typography, TextField, Button, Link as Muilink } from "@mui/material";
+import { Grid, Paper, Typography, TextField, Button, Link as Muilink, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import API from '../api';
 import { useAuthContext, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
 import { UserInterface } from "../types";
+import LoginBackground from './LoginBackground';
 
 const StyledGrid = styled(Grid, {
   name: "StyledGrid",
@@ -14,6 +15,7 @@ const StyledGrid = styled(Grid, {
 })({
   justifyContent: "center",
   minHeight: "90vh",
+  maxWidth: "100vw",
 });
 
 const StyledPaper = styled(Paper, {
@@ -23,6 +25,9 @@ const StyledPaper = styled(Paper, {
   justifyContent: "center",
   minHeight: "22vh",
   padding: "50px",
+  borderRadius: "20px",
+  background: "transparent",
+  backdropFilter: "blur(15px)",
 });
 
 const ErrMsgTypography = styled(Typography, {
@@ -119,10 +124,14 @@ function Login() {
 
   const out = show ?
   (
-    <Grid container spacing={0} justifyContent="center" direction="row">
+    <LoginBackground>
+     <Grid container spacing={0} justifyContent="center" direction="row" >
       <Grid item >
         <StyledGrid container direction="column" justifyContent="center" spacing={2} >
-          <StyledPaper variant="elevation" elevation={2} sx={{ bgcolor: "background.lightestBlue" }}>
+          <Grid item >
+            <Box style={{width:"20%", height:"20%", backgroundImage: "../assets/background1.jpg" }} />
+          </Grid>
+          <StyledPaper variant="elevation" elevation={2} >
             <Grid item>
               {errMsg === "" ? <OffscreenTypography ref={errRef} aria-live="assertive" /> : <ErrMsgTypography ref={errRef} aria-live="assertive" >{errMsg}</ErrMsgTypography>}
             </Grid>
@@ -135,14 +144,12 @@ function Login() {
                   <Grid item>
                     <TextField
                       id="login"
-                      // ref={userRef}
                       type="login"
                       placeholder={t('login.login') as string}
                       variant="outlined"
                       value={login}
                       onChange={changeLogin}
                       required
-                      // />
                       autoFocus={true} />
                   </Grid>
                   <Grid item>
@@ -171,8 +178,11 @@ function Login() {
           </StyledPaper >
         </StyledGrid >
       </Grid >
-    </Grid > ) :
-    null;
+    </Grid > *
+    </LoginBackground>
+   ) :
+    // null;
+    <LoginBackground><></></LoginBackground>
 
   return out
     
