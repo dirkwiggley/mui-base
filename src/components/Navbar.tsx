@@ -8,7 +8,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { Link as MaterialLink } from "@mui/material";
+import { Link as MaterialLink, ThemeProvider } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 
@@ -17,7 +17,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useAuthContext } from "./AuthStore";
 import API from "../api";
 
-import { otherColors } from "../theme";
+import { otherColors, theme } from "../theme";
 
 const MobileBox = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -123,6 +123,7 @@ export default function MenuAppBar() {
   }
 
   return (
+    <ThemeProvider theme={theme}>
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" sx={{ boxShadow: 0 }}>
         <Toolbar sx={{ bgcolor: otherColors.darkestBlue }}>
@@ -165,21 +166,33 @@ export default function MenuAppBar() {
               </Menu>
             </Box>
           </MobileBox>
-          <Typography variant="h6" component="span" sx={{ mr: 2 }}>
+          <Typography variant="h6" component="span" sx={{ mr: 2, fontWeight: "bold" }}>
             App
           </Typography>
           <NonMobileBox>
             <MaterialLink
               component={RouterLink}
               to="/home"
-              sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
+              sx={{ 
+                flexGrow: 1, 
+                ml: 1, 
+                mr: 1, 
+                color: "#FFFFFF",
+                fontWeight: "bold",
+                textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
             >
               {t('navbar.home')}
             </MaterialLink>
             <MaterialLink
               component={RouterLink}
               to="/about"
-              sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
+              sx={{ 
+                flexGrow: 1, 
+                ml: 1, 
+                mr: 1, 
+                color: "#FFFFFF",
+                fontWeight: "bold",
+                textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
             >
               {t('navbar.about')}
             </MaterialLink>
@@ -187,8 +200,14 @@ export default function MenuAppBar() {
               <MaterialLink
                 component={RouterLink}
                 to="/users"
-                sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
-              >
+                sx={{ 
+                  flexGrow: 1, 
+                  ml: 1, 
+                  mr: 1, 
+                  color: "#FFFFFF",
+                  fontWeight: "bold",
+                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
+                >
                 {t('navbar.users')}
               </MaterialLink>
             ) : null}
@@ -196,8 +215,14 @@ export default function MenuAppBar() {
               <MaterialLink
                 component={RouterLink}
                 to="/dbeditor"
-                sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
-              >
+                sx={{ 
+                  flexGrow: 1, 
+                  ml: 1, 
+                  mr: 1, 
+                  color: "#FFFFFF",
+                  fontWeight: "bold",
+                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
+                >
                 {t('navbar.dbeditor')}
               </MaterialLink>
             ) : null}
@@ -205,8 +230,14 @@ export default function MenuAppBar() {
               <MaterialLink
                 component={RouterLink}
                 to="/profile"
-                sx={{ flexGrow: 1, ml: 1, mr: 1, color: "#FFFFFF" }}
-              >
+                sx={{ 
+                  flexGrow: 1, 
+                  ml: 1, 
+                  mr: 1, 
+                  color: "#FFFFFF",
+                  fontWeight: "bold",
+                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
+                >
                 {t('navbar.profile')}
               </MaterialLink>
             ) : null}
@@ -252,5 +283,6 @@ export default function MenuAppBar() {
         </Toolbar>
       </AppBar>
     </Box>
+    </ThemeProvider>
   );
 }

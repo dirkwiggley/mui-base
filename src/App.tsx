@@ -14,10 +14,11 @@ import Locales from "./components/Locales";
 import Exit from "./components/Exit";
 import Footer from "./components/Footer";
 import { AuthProvider } from './components/AuthStore';
+import BackgroundBox from './components/BackgroundBox';
 
 function App() {
   return (
-    <Box>
+    <BackgroundBox>
       <AuthProvider>
         <Router>
           <Navbar />
@@ -36,7 +37,7 @@ function App() {
           <Footer />
         </Router>
       </AuthProvider>
-    </Box>
+    </BackgroundBox>
   );
 }
 

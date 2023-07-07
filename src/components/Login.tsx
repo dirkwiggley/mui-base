@@ -71,10 +71,15 @@ function Login() {
     setErrMsg('');
   }, [login, password]);
 
+  const clickEvent = (event: { stopPropagation: () => void; }) => {
+    event.stopPropagation();
+  }
+
   const changeLogin = (event: ChangeEvent<HTMLInputElement>) => {
     setLogin(event.target.value);
     setErrMsg("");
   }
+
 
   const changePassword = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
@@ -129,7 +134,7 @@ function Login() {
       <Grid item >
         <StyledGrid container direction="column" justifyContent="center" spacing={2} >
           <Grid item >
-            <Box style={{width:"20%", height:"20%", backgroundImage: "../assets/background1.jpg" }} />
+            <Box style={{width:"20%", height:"20%", backgroundImage: "../assets/background2.jpg" }} />
           </Grid>
           <StyledPaper variant="elevation" elevation={2} >
             <Grid item>
@@ -148,6 +153,7 @@ function Login() {
                       placeholder={t('login.login') as string}
                       variant="outlined"
                       value={login}
+                      onClick={clickEvent}
                       onChange={changeLogin}
                       required
                       autoFocus={true} />
@@ -159,6 +165,7 @@ function Login() {
                       placeholder={t('login.password') as string}
                       variant="outlined"
                       value={password}
+                      onClick={clickEvent}
                       onChange={changePassword}
                       required />
                   </Grid>
@@ -178,7 +185,7 @@ function Login() {
           </StyledPaper >
         </StyledGrid >
       </Grid >
-    </Grid > *
+    </Grid >
     </LoginBackground>
    ) :
     // null;

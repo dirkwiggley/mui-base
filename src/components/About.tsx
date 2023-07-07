@@ -43,7 +43,7 @@ function About() {
   };
 
   return (
-    <Box pt={3} overflow="hidden">
+    <Box pt={3} overflow="hidden" sx={{pt: 25}}>
       <Grid2 container spacing={2}>
         <Grid2 xs={12}>
           <Box
@@ -53,7 +53,7 @@ function About() {
               justifyContent: "center",
             }}
           >
-            <Card variant="outlined" sx={{ minWidth: 275 }}>
+            <Card variant="outlined" sx={{ minWidth: 275, bgcolor: "rgba(255,255,255,0.5)" }}>
               <CardContent>
                 <Typography
                   sx={{ fontSize: 14 }}
@@ -73,7 +73,7 @@ function About() {
                   <br />
                   {'"a benevolent smile"'}
                 </Typography>
-                <Typography sx={{mt: 2}} variant="body2">
+                <Typography sx={{ mt: 2 }} variant="body2">
                   * For the demo, login as
                 </Typography>
                 <Typography variant="body2">

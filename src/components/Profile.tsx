@@ -11,7 +11,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   justifyContent: "center",
   minHeight: "20vh",
   padding: "50px",
-  backgroundColor: "background.scissors",
+  backgroundColor: "rgba(255,255,255,0.5)",
 }));
 
 const Profile = () => {
