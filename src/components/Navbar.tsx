@@ -8,7 +8,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { Link as MaterialLink, ThemeProvider } from "@mui/material";
+import { Link as MaterialLink } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 
@@ -18,23 +18,7 @@ import { useAuthContext } from "./AuthStore";
 import API from "../api";
 
 import { otherColors, theme } from "../theme";
-
-const MobileBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  [theme.breakpoints.up("sm")]: {
-    display: "none",
-  },
-}));
-
-const NonMobileBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flex: 1,
-  alignItems: "center",
-  [theme.breakpoints.down("sm")]: {
-    display: "none",
-  },
-}));
+import { MobileBox, NonMobileBox } from "./MobileBox";
 
 export default function MenuAppBar() {
   const { t, i18n } = useTranslation();
@@ -123,7 +107,6 @@ export default function MenuAppBar() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky" sx={{ boxShadow: 0 }}>
         <Toolbar sx={{ bgcolor: otherColors.darkestBlue }}>
@@ -179,9 +162,10 @@ export default function MenuAppBar() {
                 mr: 1, 
                 color: "#FFFFFF",
                 fontWeight: "bold",
-                textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
+                // textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' 
+              }}
             >
-              {t('navbar.home')}
+              <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.home')}</Typography>
             </MaterialLink>
             <MaterialLink
               component={RouterLink}
@@ -192,9 +176,10 @@ export default function MenuAppBar() {
                 mr: 1, 
                 color: "#FFFFFF",
                 fontWeight: "bold",
-                textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
+                // textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' 
+              }}
             >
-              {t('navbar.about')}
+              <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.about')}</Typography>
             </MaterialLink>
             {isAdmin ? (
               <MaterialLink
@@ -206,9 +191,10 @@ export default function MenuAppBar() {
                   mr: 1, 
                   color: "#FFFFFF",
                   fontWeight: "bold",
-                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
-                >
-                {t('navbar.users')}
+                  // textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' 
+                }}
+              >
+                <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.users')}</Typography>
               </MaterialLink>
             ) : null}
             {isAdmin ? (
@@ -221,9 +207,10 @@ export default function MenuAppBar() {
                   mr: 1, 
                   color: "#FFFFFF",
                   fontWeight: "bold",
-                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
-                >
-                {t('navbar.dbeditor')}
+                  // textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' 
+                }}
+              >
+                <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.dbeditor')}</Typography>
               </MaterialLink>
             ) : null}
             {roles && roles.length > 0 ? (
@@ -236,9 +223,10 @@ export default function MenuAppBar() {
                   mr: 1, 
                   color: "#FFFFFF",
                   fontWeight: "bold",
-                  textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' }}
-                >
-                {t('navbar.profile')}
+                  // textShadow: '2px 2px 10px rgba(0, 0, 0, 1.0), -2px -2px 1px rgba(0, 0, 0, 1.0)' 
+                }}
+              >
+                <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.profile')}</Typography>
               </MaterialLink>
             ) : null}
           </NonMobileBox>
@@ -283,6 +271,5 @@ export default function MenuAppBar() {
         </Toolbar>
       </AppBar>
     </Box>
-    </ThemeProvider>
   );
 }

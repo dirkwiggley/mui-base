@@ -56,7 +56,7 @@ const StyledHeaderGrid = styled(Box)({
   padding: 50,
   justifyContent: "center",
   alignContent: "center",
-  display: "block"
+  display: "block",
 });
 
 interface AnchorPoint {

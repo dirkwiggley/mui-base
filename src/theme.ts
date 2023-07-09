@@ -23,7 +23,8 @@ export const otherColors = {
     // background: {
     //   medium: "#3BACB6",
     //   light: "#82DBD8",
-      darkestBlue: "#2155CD",
+      // darkestBlue: "#2155CD",
+      darkestBlue: "#D2B48C",
     //   darkerBlue: "#0AA1DD",
     //   lightBlue: "#79DAE8",
     //   lightestBlue: "#E8F9FD",

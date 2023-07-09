@@ -17,14 +17,11 @@ const BackgroundBox = (props: ContainerProps) => {
             overflow={"hidden"}
             sx={{ 
                 maxWidth: "100vw", 
-                maxHeight: "100vh",
                 minHeight: "100vh",
                 backgroundImage:`url(${getBackground()})`,
                 backgroundSize: "cover",
-                objectFit: "cover",
-                }}>
+            }}>
             {props.children}
-            
         </Box>
     )
 }

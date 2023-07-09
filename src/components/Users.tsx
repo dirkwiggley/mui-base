@@ -17,7 +17,8 @@ import {
   SelectChangeEvent,
   Snackbar,
   Alert,
-  Autocomplete
+  Autocomplete,
+  Grid
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useTranslation } from "react-i18next";
@@ -27,6 +28,7 @@ import API, { authHelper, RoleType, isRole, isUserInterface } from '../api';
 import { UserInterface } from "../types";
 import { AlertColor } from '@mui/material/Alert';
 import { supportedLocales } from './Locales';
+import { MobileBox, NonMobileBox } from './MobileBox';
 
 const PAPER_COLOR = "#99d6ff";
 const LIGHT_PAPER_COLOR = "#a8e6f0";
@@ -366,113 +368,236 @@ const Users = () => {
     jsRoles = roles;
   }
 
-  return (
-    <Box
-      display="flex"
-      justifyContent="Center"
-      sx={{
-        width: '90%',
-        mt: 1
-      }}>
-      {getSnackbar()}
-      <StyledPaper square={false} >
-        <Stack spacing={0}>
-          <StackItem><h3>{t('user.title')}</h3></StackItem>
-          <StackItem>
-            <FormControl variant="filled" fullWidth>
-              <InputLabel id="select-label">{t('user.user')}</InputLabel>
-              <Select
-                labelId="select-label"
-                id="select-user"
-                value={users?.length > 0 ? userId : ""}
-                onChange={(evt) => handleSelectUser(evt)}
-              >
-                {users}
-              </Select>
-            </FormControl>
-          </StackItem>
-          <StackItem>
-            <FormControl variant="filled" fullWidth>
-              {getLoginInput()}
-            </FormControl>
-          </StackItem>
-          <StackItem>
-            <FormControl variant="filled" fullWidth>
-              <TextField
-                id="nicknameInput"
-                label={t('user.nickname')}
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                value={nickname}
-                onChange={(evt) => handleInputChange(evt, "nicknameInput")} />
-            </FormControl>
-          </StackItem>
-          <StackItem>
-            <FormControl variant="filled" fullWidth>
-              <TextField
-                id="emailInput"
-                label={t('user.email')}
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                value={email}
-                onChange={(evt) => handleInputChange(evt, "emailInput")} />
-            </FormControl>
-          </StackItem>
-          <StackItem>
-            <FormControl variant="filled" fullWidth>
-              <InputLabel id="select-locale-label">{t('user.locale')}</InputLabel>
-              <Select
-                labelId="select-locale-label"
-                id="select-locale"
-                value={locales?.length > 0 ? locale : ""}
-                onChange={(evt) => handleSelectLocale(evt)}
-              >
-                {locales}
-              </Select>
-            </FormControl>
-          </StackItem>
-          <StackItem>
-            <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
-              <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
-                {t('user.roles')}
-              </Typography>
-              <FormControl sx={{ width: "100%", ml: 2 }}>
-                {jsRolesList.map((option) => (
-                  <FormGroup key={option}>
-                    {/* Is this option in the users roles? */}
-                    <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} />} label={option} onChange={() => handleChangeRoles(option)} />
-                  </FormGroup>
-                ))}
+  const getUserEditor = () => {
+    return (
+      <Box
+        display="flex"
+        justifyContent="Center"
+        sx={{
+          minWidth: '50%',
+          mt: 3
+        }}>
+        {getSnackbar()}
+        <StyledPaper square={false} >
+          <Stack spacing={0}>
+            <StackItem><Typography variant="h5" component="span" sx={{ mr: 2 }}>{t('user.title')}</Typography></StackItem>
+            <StackItem>
+              <FormControl variant="filled" fullWidth>
+                <InputLabel id="select-label">{t('user.user')}</InputLabel>
+                <Select
+                  labelId="select-label"
+                  id="select-user"
+                  value={users?.length > 0 ? userId : ""}
+                  onChange={(evt) => handleSelectUser(evt)}
+                >
+                  {users}
+                </Select>
               </FormControl>
-            </StyledPaper>
-          </StackItem>
-          <StackItem>
-            <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
-              <Stack>
-                <StackItem>
-                  <Typography sx={{ p: 0, ml: 1 }}>
-                    {t('user.misc')}
-                  </Typography>
-                </StackItem>
-                <StackItem>
-                  <FormGroup>
-                    <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
-                  </FormGroup>
-                </StackItem>
-                <StackItem>
-                  <FormGroup>
-                    <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
-                  </FormGroup>
-                </StackItem>
-              </Stack>
-            </StyledPaper>
-          </StackItem>
-          <StackItem>
-            <Button variant="contained" onClick={handleUpdate}>{t('user.update')}</Button>
-          </StackItem>
-        </Stack>
-      </StyledPaper>
-    </Box>
+            </StackItem>
+            <StackItem>
+              <FormControl variant="filled" fullWidth>
+                {getLoginInput()}
+              </FormControl>
+            </StackItem>
+            <StackItem>
+              <FormControl variant="filled" fullWidth>
+                <TextField
+                  id="nicknameInput"
+                  label={t('user.nickname')}
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  value={nickname}
+                  onChange={(evt) => handleInputChange(evt, "nicknameInput")} />
+              </FormControl>
+            </StackItem>
+            <StackItem>
+              <FormControl variant="filled" fullWidth>
+                <TextField
+                  id="emailInput"
+                  label={t('user.email')}
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  value={email}
+                  onChange={(evt) => handleInputChange(evt, "emailInput")} />
+              </FormControl>
+            </StackItem>
+            <StackItem>
+              <FormControl variant="filled" fullWidth>
+                <InputLabel id="select-locale-label">{t('user.locale')}</InputLabel>
+                <Select
+                  labelId="select-locale-label"
+                  id="select-locale"
+                  value={locales?.length > 0 ? locale : ""}
+                  onChange={(evt) => handleSelectLocale(evt)}
+                >
+                  {locales}
+                </Select>
+              </FormControl>
+            </StackItem>
+            <StackItem>
+              <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
+                  {t('user.roles')}
+                </Typography>
+                <FormControl sx={{ width: "100%", ml: 2 }}>
+                  {jsRolesList.map((option) => (
+                    <FormGroup key={option}>
+                      {/* Is this option in the users roles? */}
+                      <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} />} label={option} onChange={() => handleChangeRoles(option)} />
+                    </FormGroup>
+                  ))}
+                </FormControl>
+              </StyledPaper>
+            </StackItem>
+            <StackItem>
+              <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                <Stack>
+                  <StackItem>
+                    <Typography sx={{ p: 0, ml: 1 }}>
+                      {t('user.misc')}
+                    </Typography>
+                  </StackItem>
+                  <StackItem>
+                    <FormGroup>
+                      <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
+                    </FormGroup>
+                  </StackItem>
+                  <StackItem>
+                    <FormGroup>
+                      <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
+                    </FormGroup>
+                  </StackItem>
+                </Stack>
+              </StyledPaper>
+            </StackItem>
+            <StackItem>
+              <Button variant="contained" onClick={handleUpdate}>{t('user.update')}</Button>
+            </StackItem>
+          </Stack>
+        </StyledPaper>
+      </Box>
+    );
+  }
+  return (
+    <>
+      <MobileBox>
+        {getUserEditor()}
+      </MobileBox>
+      <NonMobileBox>
+        <Grid container>
+          <Grid xs></Grid>
+          <Grid xs={3}>
+            <Box
+              display="flex"
+              justifyContent="Center"
+              sx={{
+                minWidth: '50%',
+                mt: 3
+              }}>
+              {getSnackbar()}
+              <StyledPaper square={false} >
+                <Stack spacing={0}>
+                  <StackItem><Typography variant="h5" component="span" sx={{ mr: 2 }}>{t('user.title')}</Typography></StackItem>
+                  <StackItem>
+                    <FormControl variant="filled" fullWidth>
+                      <InputLabel id="select-label">{t('user.user')}</InputLabel>
+                      <Select
+                        labelId="select-label"
+                        id="select-user"
+                        value={users?.length > 0 ? userId : ""}
+                        onChange={(evt) => handleSelectUser(evt)}
+                      >
+                        {users}
+                      </Select>
+                    </FormControl>
+                  </StackItem>
+                  <StackItem>
+                    <FormControl variant="filled" fullWidth>
+                      {getLoginInput()}
+                    </FormControl>
+                  </StackItem>
+                  <StackItem>
+                    <FormControl variant="filled" fullWidth>
+                      <TextField
+                        id="nicknameInput"
+                        label={t('user.nickname')}
+                        InputLabelProps={{ shrink: true }}
+                        autoComplete="off"
+                        value={nickname}
+                        onChange={(evt) => handleInputChange(evt, "nicknameInput")} />
+                    </FormControl>
+                  </StackItem>
+                  <StackItem>
+                    <FormControl variant="filled" fullWidth>
+                      <TextField
+                        id="emailInput"
+                        label={t('user.email')}
+                        InputLabelProps={{ shrink: true }}
+                        autoComplete="off"
+                        value={email}
+                        onChange={(evt) => handleInputChange(evt, "emailInput")} />
+                    </FormControl>
+                  </StackItem>
+                  <StackItem>
+                    <FormControl variant="filled" fullWidth>
+                      <InputLabel id="select-locale-label">{t('user.locale')}</InputLabel>
+                      <Select
+                        labelId="select-locale-label"
+                        id="select-locale"
+                        value={locales?.length > 0 ? locale : ""}
+                        onChange={(evt) => handleSelectLocale(evt)}
+                      >
+                        {locales}
+                      </Select>
+                    </FormControl>
+                  </StackItem>
+                  <StackItem>
+                    <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                      <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
+                        {t('user.roles')}
+                      </Typography>
+                      <FormControl sx={{ width: "100%", ml: 2 }}>
+                        {jsRolesList.map((option) => (
+                          <FormGroup key={option}>
+                            {/* Is this option in the users roles? */}
+                            <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} />} label={option} onChange={() => handleChangeRoles(option)} />
+                          </FormGroup>
+                        ))}
+                      </FormControl>
+                    </StyledPaper>
+                  </StackItem>
+                  <StackItem>
+                    <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                      <Stack>
+                        <StackItem>
+                          <Typography sx={{ p: 0, ml: 1 }}>
+                            {t('user.misc')}
+                          </Typography>
+                        </StackItem>
+                        <StackItem>
+                          <FormGroup>
+                            <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
+                          </FormGroup>
+                        </StackItem>
+                        <StackItem>
+                          <FormGroup>
+                            <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
+                          </FormGroup>
+                        </StackItem>
+                      </Stack>
+                    </StyledPaper>
+                  </StackItem>
+                  <StackItem>
+                    <Button variant="contained" onClick={handleUpdate}>{t('user.update')}</Button>
+                  </StackItem>
+                </Stack>
+              </StyledPaper>
+            </Box>
+          </Grid>
+          <Grid xs></Grid>
+        </Grid>
+      </NonMobileBox>
+    </>
   );
 }
 

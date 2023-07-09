@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import API from '../api';
 import { useAuthContext, instanceofUserInfo, convertToUserInfo, defaultUserInfo } from './AuthStore';
 import { UserInterface } from "../types";
-import LoginBackground from './LoginBackground';
 
 const StyledGrid = styled(Grid, {
   name: "StyledGrid",
@@ -26,7 +25,7 @@ const StyledPaper = styled(Paper, {
   minHeight: "22vh",
   padding: "50px",
   borderRadius: "20px",
-  background: "transparent",
+  background: "rgba(255,255,255,1.0)",//"transparent",
   backdropFilter: "blur(15px)",
 });
 
@@ -129,8 +128,7 @@ function Login() {
 
   const out = show ?
   (
-    <LoginBackground>
-     <Grid container spacing={0} justifyContent="center" direction="row" >
+    <Grid container spacing={0} justifyContent="center" direction="row" >
       <Grid item >
         <StyledGrid container direction="column" justifyContent="center" spacing={2} >
           <Grid item >
@@ -186,10 +184,8 @@ function Login() {
         </StyledGrid >
       </Grid >
     </Grid >
-    </LoginBackground>
    ) :
-    // null;
-    <LoginBackground><></></LoginBackground>
+    null;
 
   return out
     
