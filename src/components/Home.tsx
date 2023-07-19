@@ -75,7 +75,7 @@ function Home() {
   return (
     <Box overflow="hidden" sx={{ minHeight: "91vh" }}>
       <Grid container spacing={2}>
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <Box
             style={{
               display: "flex",
@@ -98,7 +98,7 @@ function Home() {
               </CardContent>
               <CardActions>
                 <Button onClick={(e) => handleClick(e)} size="small">
-                  {t('home.action')}
+                  <Typography color="text.primary">{t('home.action')}</Typography>
                 </Button>
               </CardActions>
             </Card>

@@ -1,3 +1,4 @@
+import { blueGrey } from '@mui/material/colors';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -43,7 +44,7 @@ const StackItem = styled(Box)(({ theme }) => ({
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   //backgroundColor: PAPER_COLOR,
-  backgroundColor: "rgba(153,214,255,0.5)",
+  backgroundColor: "rgba(210, 180, 140, 0.5)",
   width: '90%',
   justify: 'center',
   textAlign: 'center',
@@ -368,6 +369,11 @@ const Users = () => {
     jsRoles = roles;
   }
 
+  const getActive = () => {
+    if (active) return true;
+    return false;
+  }
+
   const getUserEditor = () => {
     return (
       <Box
@@ -443,7 +449,7 @@ const Users = () => {
                   {jsRolesList.map((option) => (
                     <FormGroup key={option}>
                       {/* Is this option in the users roles? */}
-                      <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} />} label={option} onChange={() => handleChangeRoles(option)} />
+                      <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} sx={{ color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] } }} />} label={option} onChange={() => handleChangeRoles(option)} />
                     </FormGroup>
                   ))}
                 </FormControl>
@@ -459,12 +465,16 @@ const Users = () => {
                   </StackItem>
                   <StackItem>
                     <FormGroup>
-                      <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
+                      <FormControlLabel control={
+                        <Checkbox id="active" checked={getActive()} onClick={handleActive} color="default" 
+                          sx={{ p: 0, ml: 2, color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] } }} />}
+                          label={t('user.active')} />
                     </FormGroup>
                   </StackItem>
                   <StackItem>
                     <FormGroup>
-                      <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
+                      <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} 
+                        sx={{ p: 0, ml: 2,color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] } }} />} label={t('user.resetpwd')} />
                     </FormGroup>
                   </StackItem>
                 </Stack>
@@ -478,6 +488,7 @@ const Users = () => {
       </Box>
     );
   }
+
   return (
     <>
       <MobileBox>
@@ -485,8 +496,8 @@ const Users = () => {
       </MobileBox>
       <NonMobileBox>
         <Grid container>
-          <Grid xs></Grid>
-          <Grid xs={3}>
+          <Grid item xs></Grid>
+          <Grid item xs={3}>
             <Box
               display="flex"
               justifyContent="Center"
@@ -552,7 +563,7 @@ const Users = () => {
                     </FormControl>
                   </StackItem>
                   <StackItem>
-                    <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                    <StyledPaper sx={{ backgroundColor: "rgba(217, 189, 176,0.5)", width: "100%" }}>
                       <Typography sx={{ display: "flex", ml: 2, pt: 2 }} >
                         {t('user.roles')}
                       </Typography>
@@ -560,14 +571,15 @@ const Users = () => {
                         {jsRolesList.map((option) => (
                           <FormGroup key={option}>
                             {/* Is this option in the users roles? */}
-                            <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} />} label={option} onChange={() => handleChangeRoles(option)} />
+                            <FormControlLabel control={<Checkbox checked={isCheckedRole(option)} 
+                              sx={{ color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] } }} />} label={option} onChange={() => handleChangeRoles(option)} />
                           </FormGroup>
                         ))}
                       </FormControl>
                     </StyledPaper>
                   </StackItem>
                   <StackItem>
-                    <StyledPaper sx={{ backgroundColor: "rgba(153,214,255,0.5)", width: "100%" }}>
+                    <StyledPaper sx={{ backgroundColor: "rgba(217, 189, 176,0.5)", width: "100%" }}>
                       <Stack>
                         <StackItem>
                           <Typography sx={{ p: 0, ml: 1 }}>
@@ -576,12 +588,14 @@ const Users = () => {
                         </StackItem>
                         <StackItem>
                           <FormGroup>
-                            <FormControlLabel control={<Checkbox id="active" checked={active} onClick={handleActive} sx={{ p: 0, ml: 2 }} />} label={t('user.active')} />
+                            <FormControlLabel control={<Checkbox id="active" checked={getActive()} onClick={handleActive} 
+                              sx={{ p: 0, ml: 2, color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] }, }} />}  label={t('user.active')} />
                           </FormGroup>
                         </StackItem>
                         <StackItem>
                           <FormGroup>
-                            <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} sx={{ p: 0, ml: 2 }} />} label={t('user.resetpwd')} />
+                            <FormControlLabel control={<Checkbox id="resetpassword" checked={resetpwd} onClick={handleResetpwd} 
+                              sx={{ p: 0, ml: 2, color: blueGrey[900], '&.Mui-checked': { color: blueGrey[900] }, }} />} label={t('user.resetpwd')} />
                           </FormGroup>
                         </StackItem>
                       </Stack>
@@ -594,7 +608,7 @@ const Users = () => {
               </StyledPaper>
             </Box>
           </Grid>
-          <Grid xs></Grid>
+          <Grid item xs></Grid>
         </Grid>
       </NonMobileBox>
     </>
