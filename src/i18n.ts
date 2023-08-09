@@ -87,6 +87,7 @@ i18n
           },
           footer: {
             user: "User",
+            notloggedIn: "Not logged in",
           }
         },
       },
@@ -159,6 +160,7 @@ i18n
           },
           footer: {
             user: "Benutzer",
+            notloggedIn: "Nicht eingeloggt",
           }
         },          
       },
@@ -232,6 +234,7 @@ i18n
           },
           footer: {
             user: "Do utilizador",
+            notloggedIn: "Não logado",
           }
         },
       },

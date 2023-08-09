@@ -8,7 +8,7 @@ import { otherColors } from "../theme";
 import { useAuthContext } from "./AuthStore";
 
 const paperStyle = {
-  bgcolor: "background.darkestBlue",
+  bgcolor: "background.otherBackground",
   color: "#FFFFFF",
   borderRadius: 0,
   width: "100vw",
@@ -59,7 +59,7 @@ function Footer() {
     <NonMobileBox>
       <footer>
         <Box sx={{ flexGrow: 1 }}>
-          <Paper sx={{ ...paperStyle, bgcolor: otherColors.darkestBlue }}>
+          <Paper sx={{ ...paperStyle, bgcolor: otherColors.otherBackground }}>
             <Box sx={{ ml: 2 }}>{login ? out : "-"}</Box>
           </Paper>
         </Box>
