@@ -66,6 +66,7 @@ export default function MenuAppBar() {
 
   const handleLogout = () => {
     if (auth) {
+      API.accessToken = null;
       handleClose();
       navigate("/exit");
       setAuth?.(null);
