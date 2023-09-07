@@ -106,12 +106,6 @@ export default function MenuAppBar() {
     navigate("/locales");
   }
 
-  const handleCampaign = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-    handleClose();
-    navigate("/campaigns");
-  }
-
   const handleCombatTracker = (event: React.SyntheticEvent) => {
     event.stopPropagation();
     handleClose();
@@ -151,9 +145,6 @@ export default function MenuAppBar() {
                 <MenuItem onClick={handleHome}>{t('navbar.home')}</MenuItem>
                 {roles && roles.length > 0 ? (
                   <MenuItem onClick={handleAbout}>{t('navbar.about')}</MenuItem>
-                ) : null}
-                {roles && roles.length > 0 ? (
-                  <MenuItem onClick={handleCampaign}>{t('navbar.campaign')}</MenuItem>
                 ) : null}
                 {roles && roles.length > 0 ? (
                   <MenuItem onClick={handleCombatTracker}>Combat Tracker</MenuItem>
@@ -210,21 +201,6 @@ export default function MenuAppBar() {
                 }}
               >
                 <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.users')}</Typography>
-              </MaterialLink>
-            ) : null}
-            {isAdmin ? (
-              <MaterialLink
-                component={RouterLink}
-                to="/campaigns"
-                sx={{ 
-                  flexGrow: 1, 
-                  ml: 1, 
-                  mr: 1, 
-                  color: "#FFFFFF",
-                  fontWeight: "bold",
-                }}
-              >
-                <Typography variant="h6" component="span" sx={{ mr: 2 }}>{t('navbar.campaign')}</Typography>
               </MaterialLink>
             ) : null}
             {isAdmin ? (

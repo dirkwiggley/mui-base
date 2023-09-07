@@ -42,14 +42,13 @@ i18n
             loginfailed: "Login Failed",
           },
           home: {
-            head: "Savage Worlds",
+            head: "Lizard",
             body1:
-              "",
+              "Lizards are a widespread group of squamate reptiles, with over ",
             body2:
-              "This game references the Savage Worlds game system, available from Pinnacle Entertainment Group at www.peginc.com. Savage Worlds and all associated logos and trademarks are copyrights of Pinnacle Entertainment Group. Used with permission. Pinnacle makes no representation or warranty as to the quality, viability, or suitability for purpose of this product.",
+              "6,000 species, ranging across all continents except Antarctica",
             action: "Learn More",
-          },
-          locales: {
+          },          locales: {
             locale: "Locale",
             test: "This is a test",
           },
