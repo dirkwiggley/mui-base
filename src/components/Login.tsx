@@ -14,7 +14,7 @@ const StyledGrid = styled(Grid, {
   slot: "Wrapper"
 })({
   justifyContent: "center",
-  minHeight: "90vh",
+  minHeight: "93vh",
   maxWidth: "100vw",
 });
 
@@ -45,6 +45,17 @@ const OffscreenTypography = styled(Typography, {
 })({
     display: "none"
 });
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  color: "black",
+  backgroundColor: theme.palette.secondary.main ,
+  marginRight: 1,
+  borderRadius: 25,
+  width: "100%",
+  // '&:hover': {
+  //   backgroundColor: otherColors.lighterGreen,
+  // }
+}));
 
 function Login() {  
   const [ auth, setAuth ] = useAuthContext();
@@ -182,11 +193,11 @@ function Login() {
                       sx={style} />
                   </Grid>
                   <Grid item>
-                    <Button
+                    <StyledButton
                       variant="contained"
                       color="primary"
                       type="submit"
-                      sx={{ width: "100%", color: otherColors.primaryLight, bgcolor: otherColors.primaryLight }} >{t('login.submit')}</Button>
+                      sx={{ width: "100%"}}>{t('login.submit')}</StyledButton>
                   </Grid>
                 </Grid>
               </form>

@@ -8,8 +8,8 @@ export const theme = createTheme({
       light: "rgba(230, 200, 160, 1.0)",
     },
     secondary: {
-      main: "#3BACB6",
-      light: "#82DBD8",
+      main: "rgba(230, 200, 160, 1.0)",
+      light: "rgba(230, 200, 160, 1.0)",
     },
     // error: {
       
