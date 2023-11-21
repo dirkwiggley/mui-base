@@ -22,7 +22,7 @@ const lngs: any = {
 function Home() {
   const { t, i18n } = useTranslation();
 
-  const [auth, setAuth] = useAuthContext();
+  const [auth] = useAuthContext();
   const [roles, setRoles] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showiFrame, setShowiFrame] = useState<boolean>(false);
